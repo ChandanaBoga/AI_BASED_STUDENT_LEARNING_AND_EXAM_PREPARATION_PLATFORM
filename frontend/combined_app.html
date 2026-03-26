@@ -1555,33 +1555,83 @@
 
         async function sendMessage() {
             const input = document.getElementById('chat-input');
-            const messagesContainer = document.getElementById('chat-messages');
             const message = input.value.trim();
-            
             if (!message) return;
 
-            // Add user message
             addMessage(message, 'user');
             input.value = '';
 
+            // Create a streaming AI bubble
+            const msgId = 'stream-' + Date.now();
+            const container = document.getElementById('chat-messages');
+            container.insertAdjacentHTML('beforeend', `
+                <div id="${msgId}" class="flex gap-2 animate-in fade-in duration-300">
+                    <div class="size-7 rounded-lg flex-shrink-0 flex items-center justify-center mt-0.5 bg-primary/10 text-primary">
+                        <span class="material-symbols-outlined text-sm">smart_toy</span>
+                    </div>
+                    <div class="max-w-[78%] min-w-0 bg-white dark:bg-slate-800 border border-blue-100/50 dark:border-blue-900/20 rounded-tl-none p-3 rounded-2xl shadow-sm" style="word-break:break-word;overflow-wrap:break-word;">
+                        <div id="${msgId}-text" class="text-sm dark:text-slate-200 leading-relaxed"><span class="inline-block w-2 h-4 bg-primary/60 animate-pulse rounded-sm"></span></div>
+                    </div>
+                </div>`);
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+
+            const textEl = document.getElementById(`${msgId}-text`);
+            let fullText = '';
+
             try {
-                // Show typing indicator
-                const typingId = addMessage('...', 'ai', true);
-                
-                const response = await fetch('http://localhost:8001/chat', {
+                const resp = await fetch(`${AI_BASE_URL}/chat/stream`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
+                    body: JSON.stringify({ message })
                 });
-                
-                const data = await response.json();
-                
-                // Replace typing indicator with response
-                removeMessage(typingId);
-                addMessage(data.response, 'ai');
+
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+                const reader = resp.body.getReader();
+                const decoder = new TextDecoder();
+                let buf = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buf += decoder.decode(value, { stream: true });
+                    // SSE lines may be split across chunks
+                    const lines = buf.split('\n');
+                    buf = lines.pop(); // keep incomplete last line
+                    for (const line of lines) {
+                        if (!line.startsWith('data:')) continue;
+                        const raw = line.slice(5).trim();
+                        if (raw === '[DONE]') break;
+                        try {
+                            const obj = JSON.parse(raw);
+                            if (obj.token) {
+                                fullText += obj.token;
+                                // Render formatted text live
+                                textEl.innerHTML = fullText
+                                    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                                    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+                                    .replace(/\n{2,}/g,'<br>')
+                                    .replace(/\n/g,' ')
+                                    + '<span class="inline-block w-2 h-4 bg-primary/60 animate-pulse rounded-sm ml-0.5"></span>';
+                                container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+                            }
+                            if (obj.error) throw new Error(obj.error);
+                        } catch (_) { /* partial JSON - skip */ }
+                    }
+                }
+                // Final render without cursor
+                textEl.innerHTML = fullText
+                    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+                    .replace(/\[(.*?)\]\((https?:\/\/[^)]+)\)/g,'<a href="$2" target="_blank" class="text-primary underline font-semibold">$1</a>')
+                    .replace(/((?<!href="))(https?:\/\/[^\s<"]+)/g,'<a href="$2" target="_blank" class="text-primary underline font-semibold">$2</a>')
+                    .replace(/^\s*[-*]\s+(.+)$/gm,'<li class="ml-4 list-disc leading-relaxed">$1</li>')
+                    .replace(/(<li[^>]*>.*?<\/li>\n?)+/gs, m => '<ul class="my-1.5 space-y-0.5">' + m + '</ul>')
+                    .replace(/\n{2,}/g,'<br>')
+                    .replace(/\n/g,' ');
             } catch (error) {
-                console.error('Chat error:', error);
-                addMessage("Sorry, I couldn't connect to the AI service. Please make sure the backend and Ollama are running.", 'ai');
+                console.error('Chat stream error:', error);
+                textEl.innerHTML = "<span class='text-red-500'>Sorry, couldn't connect to the AI service. Make sure the backend &amp; Ollama are running.</span>";
             }
         }
 
@@ -1731,23 +1781,49 @@
         function loadPerformance(profileData = null) {
             const user = localStorage.getItem('btech-logged-in-user');
             const key = getPerformanceKey();
-            const localData = JSON.parse(localStorage.getItem(key));
             
-            if (profileData && profileData.performance) {
+            console.log(`[Dashboard] Loading performance for user: ${user}`);
+            
+            if (profileData && profileData.performance && Object.keys(profileData.performance).length > 0) {
+                // ✅ BACKEND IS THE SOURCE OF TRUTH — always use profile from server
+                console.log("[Dashboard] Using backend performance data");
                 performance = profileData.performance;
+                // Cache it locally for this session only
                 localStorage.setItem(key, JSON.stringify(performance));
-            } else if (user && localData) {
-                // Only load from localStorage if a user is logged in
-                performance = localData;
+            } else if (user && !profileData) {
+                // Logged in but no profile passed — fetch fresh from backend
+                fetch(`${AI_BASE_URL}/load_user/${encodeURIComponent(user)}`)
+                    .then(r => r.ok ? r.json() : null)
+                    .then(profile => {
+                        if (profile && profile.performance && Object.keys(profile.performance).length > 0) {
+                            console.log("[Dashboard] Fetched fresh backend performance");
+                            performance = profile.performance;
+                            localStorage.setItem(key, JSON.stringify(performance));
+                        } else {
+                            performance = { ...DEFAULT_PERFORMANCE };
+                        }
+                        // Force all levels unlocked
+                        if (performance.moderate) performance.moderate.unlocked = true;
+                        if (performance.high) performance.high.unlocked = true;
+                        if (performance.advance) performance.advance.unlocked = true;
+                        updateDashboard();
+                    })
+                    .catch(() => {
+                        // Offline fallback — use local cache
+                        const localData = JSON.parse(localStorage.getItem(key));
+                        performance = localData || { ...DEFAULT_PERFORMANCE };
+                        updateDashboard();
+                    });
+                return; // Will call updateDashboard() asynchronously
             } else {
-                // Start fresh for guest OR if no local data
+                // Guest or no data — start fresh
                 performance = { ...DEFAULT_PERFORMANCE };
             }
             
-            // Force all to be unlocked
-            performance.moderate.unlocked = true;
-            performance.high.unlocked = true;
-            performance.advance.unlocked = true;
+            // Force all levels unlocked
+            if (performance.moderate) performance.moderate.unlocked = true;
+            if (performance.high) performance.high.unlocked = true;
+            if (performance.advance) performance.advance.unlocked = true;
             
             updateDashboard();
         }
@@ -1796,6 +1872,8 @@
             }
 
             const activeModules = Object.entries(performance).filter(([k,v]) => v.attempts > 0);
+            console.log(`[Dashboard] updateDashboard called. Active Modules: ${activeModules.length}`);
+            
             if (activeModules.length > 0) {
                 section.style.display = 'block';
                 const configs = {
@@ -1803,9 +1881,21 @@
                     high: { name: 'Core Engineering', icon: 'database', color: '#3b82f6' },
                     advance: { name: 'Advanced Problem Solving', icon: 'terminal', color: '#a855f7' }
                 };
+                // Build a readable name from subject quiz keys like 'sem1-c-programming'
+                function getSubjectConfig(key) {
+                    const name = key
+                        .replace(/^sem(\d+)-/, 'Sem $1 — ')
+                        .replace(/-/g, ' ')
+                        .replace(/\b\w/g, c => c.toUpperCase());
+                    const colors = ['#f59e0b', '#ec4899', '#06b6d4', '#8b5cf6', '#14b8a6', '#f97316'];
+                    const color = colors[Math.abs(key.split('').reduce((h,c)=>((h<<5)-h+c.charCodeAt(0))|0,0)) % colors.length];
+                    return { name, icon: 'school', color };
+                }
                 grid.innerHTML = activeModules.map(([key, data]) => {
-                    const conf = configs[key] || { name: key, icon: 'help', color: '#64748b' };
-                    const perc = Math.round((data.bestScore / 20) * 100);
+                    const conf = configs[key] || getSubjectConfig(key);
+                    // Use the stored totalQuestions for accurate bar width; fallback to bestScore itself
+                    const total = data.totalQuestions || data.bestScore || 1;
+                    const perc = Math.min(100, Math.round((data.bestScore / total) * 100));
                     return `
                         <div class="glass-card p-6 rounded-[2rem] border-white/60 shadow-sm flex flex-col items-start hover:shadow-xl transition-all duration-300">
                             <div class="flex justify-between w-full mb-4">
@@ -1818,7 +1908,7 @@
                             <div class="w-full mt-auto">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-[10px] font-bold text-slate-400 uppercase">Best Score</span>
-                                    <span class="text-sm font-black text-primary">${perc}%</span>
+                                    <span class="text-sm font-black text-primary">${data.bestScore}</span>
                                 </div>
                                 <div class="h-1.5 w-full bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
                                     <div class="h-full bg-primary rounded-full" style="width: ${perc}%"></div>
@@ -1827,6 +1917,24 @@
                         </div>
                     `;
                 }).join('');
+                
+                // Add Overall achievement summary card
+                const totalAttempts = activeModules.reduce((acc, [_,d]) => acc + d.attempts, 0);
+                const avgScore = Math.round(activeModules.reduce((acc, [_,d]) => acc + (d.bestScore/20)*100, 0) / activeModules.length);
+                
+                grid.insertAdjacentHTML('beforeend', `
+                    <div class="glass-card p-8 rounded-[2rem] border-primary/20 bg-primary/5 flex flex-col justify-center items-center text-center group hover:bg-primary/10 transition-all border-dashed border-2">
+                        <div class="size-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-4xl">emoji_events</span>
+                        </div>
+                        <h4 class="text-2xl font-black text-primary mb-1">Expert Level</h4>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">${totalAttempts} Total Quizzes Done</p>
+                        <div class="mt-6 px-6 py-2 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full">
+                            Verified Achievement
+                        </div>
+                    </div>
+                `);
+
             } else {
                 section.style.display = 'none';
             }
@@ -1891,24 +1999,54 @@
 
         startAIBtn.addEventListener('click', async () => {
             const topic = aiTopicInput.value.trim();
-            if(!topic) return;
+            if (!topic) return;
+
+            // --- Show animated progress bar ---
             startAIBtn.disabled = true;
-            startAIBtn.textContent = 'Generating...';
+            startAIBtn.innerHTML = `
+                <span class="flex flex-col items-center gap-1 w-full">
+                    <span class="text-sm font-bold">Generating Quiz…</span>
+                    <span class="w-full h-1.5 bg-white/20 rounded-full overflow-hidden block">
+                        <span id="quiz-progress-bar" class="block h-full bg-white rounded-full" style="width:0%;transition:width 0.4s ease"></span>
+                    </span>
+                </span>`;
+
+            // Animate progress: fast initially, then slow down near 90%
+            let prog = 0;
+            const progressEl = document.getElementById('quiz-progress-bar');
+            const progressTimer = setInterval(() => {
+                prog = prog < 70 ? prog + 4 : prog < 88 ? prog + 0.8 : prog;
+                if (progressEl) progressEl.style.width = prog + '%';
+            }, 400);
+
             try {
                 const response = await fetch(`${AI_BASE_URL}/generate_quiz`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ topic: topic, num_questions: 3 })
+                    body: JSON.stringify({ topic, num_questions: 3 })
                 });
                 const data = await response.json();
-                if(data.quiz) {
+
+                // Fill progress to 100 quickly
+                clearInterval(progressTimer);
+                if (progressEl) progressEl.style.width = '100%';
+
+                if (data.quiz && data.quiz.length > 0) {
+                    await new Promise(r => setTimeout(r, 300)); // let bar hit 100
                     quizData['ai'] = data.quiz;
                     aiTopicModal.classList.add('hidden');
                     aiTopicModal.classList.remove('flex');
                     openQuiz('ai', `AI Quiz: ${topic}`);
-                } else { alert("AI generation failed."); }
-            } catch (e) { alert("Backend not responding."); }
-            finally { startAIBtn.disabled = false; startAIBtn.textContent = 'Generate'; }
+                } else {
+                    alert(data.error ? `AI error: ${data.error}` : 'AI generation failed — try a different topic.');
+                }
+            } catch (e) {
+                clearInterval(progressTimer);
+                alert('Backend not responding. Make sure the server is running.');
+            } finally {
+                startAIBtn.disabled = false;
+                startAIBtn.innerHTML = 'Generate';
+            }
         });
 
         document.getElementById('close-quiz-btn').addEventListener('click', closeAll);
@@ -1978,9 +2116,17 @@
             const totalQText = document.querySelector('#results-modal .text-xl.text-slate-400');
             if (totalQText) totalQText.textContent = `/${currentQuestions.length}`;
             if (currentModule !== 'ai') {
-                if (!performance[currentModule]) performance[currentModule] = { attempts: 0, bestScore: 0, unlocked: true };
+                if (!performance[currentModule]) performance[currentModule] = { attempts: 0, bestScore: 0, totalQuestions: 0, unlocked: true };
                 performance[currentModule].attempts++;
-                if (score > performance[currentModule].bestScore) performance[currentModule].bestScore = score;
+                // Update best score and record the total questions for that attempt
+                if (score > performance[currentModule].bestScore) {
+                    performance[currentModule].bestScore = score;
+                    performance[currentModule].totalQuestions = currentQuestions.length;
+                }
+                // Ensure totalQuestions is always set
+                if (!performance[currentModule].totalQuestions) {
+                    performance[currentModule].totalQuestions = currentQuestions.length;
+                }
                 savePerformance();
             }
         }
@@ -2030,6 +2176,10 @@
 
         selectAISemester(1);
         loadPerformance();
+        
+        // Expose functions globally so the login script in the second block can call them
+        window.loadPerformance = loadPerformance;
+        window.updateDashboard = updateDashboard;
     });
 </script>
     <!-- Login Modal -->
@@ -2227,35 +2377,28 @@
             }
         }
 
-        // Check for saved user on load
-        const savedUser = sessionStorage.getItem(LOGGED_IN_USER_KEY);
+        // Always show the login gate on page load.
+        // For returning users, pre-fill the username for convenience.
+        const savedUser = localStorage.getItem(LOGGED_IN_USER_KEY);
+        console.log(`[Auth] Saved user check: ${savedUser}`);
+        
+        // Always remove the stored key so each session requires a fresh login
+        localStorage.removeItem(LOGGED_IN_USER_KEY);
+        
+        // Pre-fill gate username if the user was previously logged in
         if (savedUser) {
-            // Show loading state if needed on the gate (gate is visible by default)
-            const gateBtn = document.querySelector('#gate-login-form button[type="submit"]');
-            if (gateBtn) {
-                gateBtn.disabled = true;
-                gateBtn.innerHTML = '<span class="animate-spin material-symbols-outlined">sync</span> Loading...';
+            const gateUsernameInput = document.getElementById('gate-username');
+            if (gateUsernameInput) {
+                gateUsernameInput.value = savedUser;
+                // Put focus on the roll number field so user just needs to type roll
+                const gatePasswordInput = document.getElementById('gate-password');
+                if (gatePasswordInput) gatePasswordInput.focus();
             }
-
-            fetchUserProfile(savedUser).then(profile => {
-                if (profile) {
-                    updateUIForUser(profile);
-                    if (typeof loadPerformance === "function") loadPerformance(profile);
-                } else {
-                    sessionStorage.removeItem(LOGGED_IN_USER_KEY);
-                    updateUIForUser(null);
-                }
-            }).catch(() => {
-                updateUIForUser(null);
-            }).finally(() => {
-                if (gateBtn) {
-                    gateBtn.disabled = false;
-                    gateBtn.innerHTML = 'Unlock Portal <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>';
-                }
-            });
-        } else {
-            updateUIForUser(null);
         }
+        
+        // Always show the gate (no auto-bypass)
+        updateUIForUser(null);
+
         
         // --- Gate Login Logic ---
         const gateLoginForm = document.getElementById('gate-login-form');
@@ -2272,7 +2415,7 @@
                 try {
                     const profile = await fetchUserProfile(fullname);
                     if (profile && profile.roll.toUpperCase() === roll.toUpperCase()) {
-                        sessionStorage.setItem(LOGGED_IN_USER_KEY, fullname);
+                        localStorage.setItem(LOGGED_IN_USER_KEY, fullname);
                         updateUIForUser(profile);
                         if (typeof loadPerformance === "function") loadPerformance(profile);
                     } else {
@@ -2306,7 +2449,7 @@
 
                 const profile = await fetchUserProfile(fullname);
                 if (profile && profile.roll.toUpperCase() === roll.toUpperCase()) {
-                    sessionStorage.setItem(LOGGED_IN_USER_KEY, fullname);
+                    localStorage.setItem(LOGGED_IN_USER_KEY, fullname);
                     updateUIForUser(profile);
                     if (typeof loadPerformance === "function") loadPerformance(profile);
                     closeLogin();
@@ -2315,7 +2458,7 @@
                 }
             });
             logoutBtn.addEventListener('click', () => {
-                sessionStorage.removeItem(LOGGED_IN_USER_KEY);
+                localStorage.removeItem(LOGGED_IN_USER_KEY);
                 localStorage.removeItem('btech-profile'); // Also clear specific profile cache
                 updateUIForUser(null);
                 if (typeof loadPerformance === "function") loadPerformance();
@@ -2436,7 +2579,7 @@
                     closeProfile();
                     
                     // Auto-login after save
-                    sessionStorage.setItem(LOGGED_IN_USER_KEY, data.fullname);
+                    localStorage.setItem(LOGGED_IN_USER_KEY, data.fullname);
                     
                     // Sync UI and Dashboard
                     if (typeof updateUIForUser === "function") updateUIForUser(data);

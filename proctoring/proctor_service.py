@@ -70,7 +70,7 @@ def analyze_frame(image: Image.Image) -> dict:
             ]
         )
         
-        raw_answer = response.message.content or ""
+        raw_answer = response.message.content if response.message else ""
         answer = raw_answer.strip().lower()
         
         # Logic: Simple yes/no detection
@@ -99,7 +99,8 @@ def health():
     try:
         # Check if the required model is pulled
         models_info = ollama.list()
-        available_models = [m.model for m in models_info.models] if hasattr(models_info, 'models') else []
+        models = getattr(models_info, 'models', []) or []
+        available_models = [m.model for m in models if m.model]
         
         # If the above fails to get names, try a simpler check if possible
         # or just assume it's there if list() didn't raise
