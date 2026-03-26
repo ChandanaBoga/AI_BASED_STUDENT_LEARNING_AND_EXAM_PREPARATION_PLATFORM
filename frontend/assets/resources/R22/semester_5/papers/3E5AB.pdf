@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+      <!-- Essentials -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TKRCET Examination Branch (K9)</title>
+  <meta name="description" content="TKRES, established in 2002, is a modern temple of learning on a lush 20-acre campus in Hyderabad.">
+  <meta name="keywords" content="TKRES, TKR, TKRCET, TKREC, Engineering, College">
+  <meta name="author" content="Dr A. Pradeep">
+  <meta name="description"
+      content="TKRCET Examination Branch provides official notifications, results, timetables, academic calendars, and syllabus information for B.Tech, M.Tech, and MBA students.">
+
+  <meta name="robots" content="index,follow">
+  <meta name="theme-color" content="#0d6efd">
+
+  <!-- Fix Referrer Policy Warnings -->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://tkrcetexams.com/Question_Papers/22Batch/3.1EQP/3E5AB.pdf">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="TKRES Teegala Krishna Reddy Education Society">
+  <meta property="og:description" content="TKRES, established in 2002, is a modern temple of learning on a lush 20-acre campus in Hyderabad.">
+  <meta property="og:url" content="https://tkrcetexams.com/Question_Papers/22Batch/3.1EQP/3E5AB.pdf">
+  <meta property="og:image" content="https://cdn.jsdelivr.net/gh/manognatha/sdc@main/images/apple-touch-icon.png">
+
+  <!-- Favicons -->
+  <link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/sdctkrcet/tkres/images/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/sdctkrcet/tkres/images/apple-touch-icon.png">
+
+  <!-- DNS Prefetch & Preconnect -->
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+  <!-- Styles: Preload → Stylesheet swap pattern -->
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/twbs/bootstrap@main/dist/css/bootstrap.min.css" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/twbs/bootstrap@main/dist/css/bootstrap.min.css" media="print" onload="this.media='all'">
+
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" media="print" onload="this.media='all'">
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.2.1/addons/bootstrap-4/jquery.smartmenus.bootstrap-4.min.css" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.2.1/addons/bootstrap-4/jquery.smartmenus.bootstrap-4.min.css" media="print" onload="this.media='all'">
+
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" media="print" onload="this.media='all'">
+
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.14.1/dist/themes/base/jquery-ui.min.css" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.14.1/dist/themes/base/jquery-ui.min.css" media="print" onload="this.media='all'">
+
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/manognatha/sdc@main/css/print.css" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/manognatha/sdc@main/css/print.css" media="print" onload="this.media='all'">
+
+  <!-- Inline Styles -->
+  <style>
+    :root {
+      --bs-body-font-size: 13px;
+      --bs-table-form-font-size: 12px;
+      --bs-small-link-font-size: 10px;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif !important;
+      font-size: var(--bs-body-font-size) !important;
+      line-height: 1.4;
+    }
+
+    .bd-placeholder-img { font-size: 1.125rem; text-anchor: middle; user-select: none; }
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg { font-size: 3.5rem; }
+    }
+
+    .btn-custom { color: #fff; background-color: #6F00FE; border-color: #995AE9; font-weight: 600 !important; }
+    .text-custom { color: #6F00FE; }
+    .text-mechanta { color: #FF5733; }
+
+    .custom-toggler .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgb(255,255,255)' stroke-width='2' stroke-linecap='round' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+    }
+    .custom-toggler.navbar-toggler { border-color: rgba(255,255,255,0.2); padding: 0 6px; margin: 1px; }
+
+    .collapsible { cursor: pointer; }
+    .content { display: none; }
+    .content p { margin: 0; }
+
+    .rtcard-container { display: flex; flex-direction: column; gap: 5px; }
+    .rtcard { border: 1px solid #ddd; border-radius: 5px; overflow: hidden; width: 100%; }
+    .rtcard-header { padding: 10px; cursor: pointer; display: block; text-decoration: none; }
+    .rtcard-body { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
+    .rtcard:target .rtcard-body { max-height: 350px; }
+
+    .card-header .fa { transition: transform .3s ease-in-out; }
+    .card-header .collapsed .fa { transform: rotate(90deg); }
+  </style></head>
+<body class="d-flex flex-column h-100">
+    <main class="flex-shrink-0">
+                <nav class="navbar sticky-top navbar-expand-lg bg-success navbar-custom mb-2" style="background: linear-success(90deg,#198754,#0d6efd);">
+    <div class="container-fluid">
+        <!-- LOGO -->
+        <a class="navbar-brand d-flex align-items-center gap-2 small p-0 fw-bold" href="#">
+            <img src="https://cdn.jsdelivr.net/gh/pradeep-adulapuram/tkrcetexams@main/images/tkrcet-logo-new.jpg"
+                width="28" height="28" class="p-0 rounded">
+            <span class="small p-0 text-white" style="font-size:16px">TKRCET Exams.</span>
+        </a>
+
+        <!-- TOGGLER -->
+        <button class="navbar-toggler custom-toggler ms-auto border-0" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- MENU -->
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav align-items-lg-center">
+
+                <!-- HOME -->
+                <li class="nav-item">
+                    <a class="nav-link rounded active" href="index.php">
+                        <i class="bi bi-house-door-fill me-1"></i> Home
+                    </a>
+                </li>
+
+                <!-- ABOUT US -->
+                <li class="nav-item">
+                    <a class="nav-link rounded " href="aboutus.php">
+                        <i class="bi bi-info-circle-fill me-1"></i> About Us
+                    </a>
+                </li>
+
+                <!-- ACADEMICS -->
+                <li class="nav-item dropdown position-relative">
+                    <a class="nav-link dropdown-toggle rounded "
+                       href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                       <i class="bi bi-mortarboard-fill me-1"></i> Academics
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item small" href="regulations.php"><i class="bi bi-file-earmark-text me-1"></i> Regulations</a></li>
+                        <li><a class="dropdown-item small" href="acm.php"><i class="bi bi-journal-bookmark me-1"></i> Academic Council Minutes</a></li>
+                        <li><a class="dropdown-item small" href="promotionrules.php"><i class="bi bi-award me-1"></i> Promotion Rules</a></li>
+                        <!--<li><a class="dropdown-item small" href="Notifications/CLASS ROOMS LIST 2024-25.pdf" target="_blank"><i class="bi bi-buildings me-1"></i> Class Rooms List</a></li>-->
+                        <li><a class="dropdown-item small" href="approvals.php"><i class="bi bi-patch-check me-1"></i> Approvals</a></li>
+                    </ul>
+                </li>
+
+                <!-- PRE EXAMS -->
+                <li class="nav-item dropdown position-relative">
+                    <a class="nav-link dropdown-toggle rounded "
+                       href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                       <i class="bi bi-journal-check me-1"></i> Pre Exams
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item small" href="subjectcodes.php"><i class="bi bi-card-checklist me-1"></i> Subject Codes</a></li>
+                        <li><a class="dropdown-item small" href="rolllist.php"><i class="bi bi-list-ol me-1"></i> Roll List</a></li>
+						<li><a class="dropdown-item small" href="studentprofile.php"><i class="bi bi-list-ol me-1"></i>Student Search</a></li>
+                        <li><a class="dropdown-item small" href="attendace_fortnight_slots.php"><i class="bi bi-calendar-event me-1"></i> Attendance Slots</a></li>
+                        <li><a class="dropdown-item small" href="detained.php"><i class="bi bi-person-x me-1"></i> Detained List</a></li>
+                        <li><a class="dropdown-item small" href="promotionlist.php"><i class="bi bi-arrow-up-circle me-1"></i> Promotion List</a></li>
+                        <li><a class="dropdown-item small" href="dropout.php"><i class="bi bi-person-dash me-1"></i> Dropout List</a></li>
+                        <li><a class="dropdown-item small" href="Pre_Exams/Re-Admitted_Students.pdf" target="_blank"><i class="bi bi-person-check me-1"></i> Re Admitted Students</a></li>
+                        <li><a class="dropdown-item small" href="Pre_Exams/Transfer_Students.pdf" target="_blank"><i class="bi bi-arrow-left-right me-1"></i> Transfer Students</a></li>
+                        <li><a class="dropdown-item small" href="internalmarks.php"><i class="bi bi-pen me-1"></i> Internal Marks</a></li>
+                    </ul>
+                </li>
+
+                <!-- ON EXAMS -->
+                <li class="nav-item dropdown position-relative">
+                    <a class="nav-link dropdown-toggle rounded "
+                       href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                       <i class="bi bi-pencil-square me-1"></i> On Exams
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item small" href="moderations.php"><i class="bi bi-sliders me-1"></i> Moderation</a></li>
+                        <li><a class="dropdown-item small" href="On_Exams/Examrules.pdf" target="_blank"><i class="bi bi-book-half me-1"></i> Examination Rules</a></li>
+                        <li><a class="dropdown-item small" href="On_Exams/MPRules.pdf" target="_blank"><i class="bi bi-file-earmark-lock2 me-1"></i> MP Rules</a></li>
+                        <!--<li><a class="dropdown-item small" href="On_Exams/24-25/B.TECH IV SEM REG-SUP EXTERNAL EXAM ROOMS LIST.pdf" target="_blank"><i class="bi bi-building me-1"></i> Exam Rooms</a></li>-->
+						<li><a class="dropdown-item small" href="question_papers.php"><i class="bi bi-file-earmark-text me-1"></i>Question Papers</a></li>
+                        <!--<li class="dropend">
+                            <a class="dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-folder2-open me-1"></i> Question Papers</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item small" href="btechqp3.1.php" target="_blank"><i class="bi bi-file-earmark-text me-1"></i> B.Tech 3.1 & 3.2</a></li>
+                                <li><a class="dropdown-item small" href="btechqp4.1.php" target="_blank"><i class="bi bi-file-earmark-text me-1"></i> B.Tech 4.1 & 4.2</a></li>
+                            </ul>
+                        </li>-->
+
+                    </ul>
+                </li>
+
+                <!-- POST EXAMS -->
+                <li class="nav-item dropdown position-relative">
+                    <a class="nav-link dropdown-toggle rounded "
+                       href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                       <i class="bi bi-briefcase-fill me-1"></i> Post Exams
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item small" href="http://192.168.14.150/PostExams/index.php" target="_blank"><i class="bi bi-grid me-1"></i> EQWM</a></li>
+						<li><a class="dropdown-item small" href="http://192.168.14.150/PostExams/awardlist_login.php" target="_blank"><i class="bi bi-grid me-1"></i> Award Lists</a></li>
+                        <li><a class="dropdown-item small" href="pqp.php"><i class="bi bi-archive me-1"></i> Previous Question Papers</a></li>
+                        <li><a class="dropdown-item small" href="On_Exams/rcrvcvguidelines.pdf" target="_blank"><i class="bi bi-info-circle me-1"></i> RCRVCV Guidelines</a></li>
+                        <li><a class="dropdown-item small" href="rtsheets.php"><i class="bi bi-file-text me-1"></i> Regular T Sheets</a></li>
+						<li><a class="dropdown-item small" href="stsheets.php"><i class="bi bi-files me-1"></i> Supply T Sheets</a></li>
+                        <!--<li class="dropend">
+                            <a class="dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-files me-1"></i> Supply T Sheets</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item small" href="24batchsup.php">2024</a></li>
+                                <li><a class="dropdown-item small" href="23batchsup.php">2023</a></li>
+                                <li><a class="dropdown-item small" href="22batchsup.php">2022</a></li>
+                                <li><a class="dropdown-item small" href="21batchsup.php">2021</a></li>
+                                <li><a class="dropdown-item small" href="20batchsup.php">2020</a></li>
+                                <li><a class="dropdown-item small" href="19batchsup.php">2019</a></li>
+                                <li><a class="dropdown-item small" href="18batchsup.php">2018</a></li>
+                                <li><a class="dropdown-item small" href="17batchsup.php">2017</a></li>
+                            </ul>
+                        </li>-->
+
+                        <li><a class="dropdown-item small" href="tracking.php"><i class="bi bi-search me-1"></i> Certificates Tracking</a></li>
+                    </ul>
+                </li>
+
+                <!-- REPORTS -->
+                <li class="nav-item dropdown position-relative">
+                    <a class="nav-link dropdown-toggle rounded "
+                       href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                       <i class="bi bi-bar-chart-line-fill me-1"></i> Reports
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item small" href="creditsreport.php"><i class="bi bi-cash-stack me-1"></i> Credits Report</a></li>
+                        <li><a class="dropdown-item small" href="consolidatedr.php"><i class="bi bi-clipboard-data me-1"></i> Consolidated Report</a></li>
+                        <li><a class="dropdown-item small" href="areports.php"><i class="bi bi-calendar-event me-1"></i> Annual Reports</a></li>
+                        <li><a class="dropdown-item small" href="https://docs.google.com/spreadsheets/d/1Y1Yy6aQj0hdrE9zTTg-E43zpYu3xQOPP/edit?usp=sharing" target="_blank"><i class="bi bi-calendar-date me-1"></i> Exam Dates</a></li>
+                        <li><a class="dropdown-item small" href="resultsapprovals.php"><i class="bi bi-check2-all me-1"></i> Results Approvals</a></li>
+                    </ul>
+                </li>
+
+                <!-- DOWNLOADS -->
+                <li class="nav-item dropdown position-relative">
+                    <a class="nav-link dropdown-toggle rounded "
+                       href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                       <i class="bi bi-download me-1"></i> Downloads
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item small" href="Downloads/invigilation-duty-adjustment-form.pdf" target="_blank"><i class="bi bi-file-earmark-arrow-down me-1"></i> Invigilation Adjust Form</a></li>
+                        <li><a class="dropdown-item small" href="student-applications.php"><i class="bi bi-person-lines-fill me-1"></i> Student Applications</a></li>
+						<li><a class="dropdown-item small" href="ctopform.php" target="_blank"><i class="bi bi-person-lines-fill me-1"></i> CGPA2Percentage</a></li>
+						<li><a class="dropdown-item small" href="mgindex.php" target="_blank"><i class="bi bi-person-lines-fill me-1"></i> Migration</a></li>
+                    </ul>
+                </li>
+
+                <!-- CONTACT, CALENDAR, VERIFICATIONS -->
+                <li class="nav-item"><a class="nav-link rounded " href="contactus.php"><i class="bi bi-telephone-fill me-1"></i> Contact Us</a></li>
+                <li class="nav-item"><a class="nav-link rounded " href="calendar.php"><i class="bi bi-calendar2-week me-1"></i> Calendar</a></li>
+                <li class="nav-item"><a class="nav-link rounded " href="verifications.php"><i class="bi bi-patch-check-fill me-1"></i> Verifications</a></li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<style>
+/* Small hover animation for icons and active link indicator */
+.navbar .nav-link { transition: all .12s ease-in-out; color: #fff; }
+.navbar .nav-link .bi { transition: transform .15s ease; }
+.navbar .nav-link:hover { transform: translateY(-2px); }
+.navbar .nav-link:hover .bi { transform: translateY(-2px) rotate(8deg); }
+.navbar .nav-link.active { background: rgba(255,255,255,0.08); }
+@media (max-width: 991px) {
+    .navbar .nav-link { color: #fff !important; }
+}
+</style>
+
+        <div class="container-fluid">
+    <div class="row">
+
+        <!-- Title -->
+        <div class="col-12 mb-2">
+            <div class="card border-warning">
+                <div class="card-header text-center">
+                    <h1 class="text-primary m-0">Welcome to TKRCET Exam Branch</h1>
+                </div>
+            </div>			
+        </div>
+
+        <!-- ==========================
+             LEFT COLUMN
+        =========================== -->
+        <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-2">
+
+            
+<!-- Bulletin Board -->
+<div class="card border-primary mb-2">
+    <div class="card-header bg-primary bg-opacity-25 text-primary fw-bold text-center">
+        Bulletin Board
+    </div>
+    <div class="card-body p-1">
+        <table class="table table-bordered mb-2 border-primary">
+            <tbody>
+
+<tr>
+<td class="text-primary">(11.03.2026)</td>
+<td>Provisional B.Tech. Grace Marks Eligible Students List – March 2026 , for more details
+&nbsp;&nbsp;<a href="Timetables/2025-26/Provisional B.Tech. Grace Marks Eligible Students List – March 2026.pdf" target="_blank" class="link-dark text-success">Click Here</a>
+</td>
+</tr>
+<tr>
+<td class="text-primary">(05.03.2026)</td>
+<td>B.Tech. I-I (R25-25 Batch) Regular Examination Results-Jan 2026 , for more details
+&nbsp;&nbsp;<a href="Timetables/2025-26/I-B.Tech. I-Sem-Regular(R25)-25 Btach Results -Jan -2026.pdf" target="_blank" class="link-dark text-success">Click Here</a>
+</td>
+</tr>
+
+<tr>
+<td class="text-primary">(05.03.2026)</td>
+<td>B.Tech. II-I (R22-24 Batch) Regular Examination Results-Dec 2025 , for more details
+&nbsp;&nbsp;<a href="Timetables/2025-26/II-B.Tech. I-Sem-Regular(R22)-24 Btach Results -Dec-2025.pdf" target="_blank" class="link-dark text-success">Click Here</a>
+</td>
+</tr>
+
+
+<tr>
+<td colspan="2" class="text-danger text-end fw-bold py-2">
+<a href="bulletinboard.php" target="_blank" class="text-danger text-decoration-none">More</a>
+</td>
+</tr>
+
+
+
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+            <!-- Students Count -->
+            <div class="card border-danger mb-2">
+                <div class="card-header bg-danger bg-opacity-25 text-danger fw-bold text-center">
+                    Students Count (2025-2026)
+                </div>
+                <div class="card-body p-1">
+                    <table class="table table-bordered table-striped border-danger text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Branch</th>
+                                <th>II SEM</th>
+                                <th>IV SEM</th>
+                                <th>VI SEM</th>
+                                <th>VIII SEM</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>CIVIL</td><td>32</td><td>34</td><td>43</td><td>56</td></tr>
+                            <tr><td>EEE</td><td>21</td><td>33</td><td>66</td><td>67</td></tr>
+                            <tr><td>ECE</td><td>153</td><td>206</td><td>268</td><td>266</td></tr>
+                            <tr><td>CSE</td><td>376</td><td>413</td><td>268</td><td>273</td></tr>
+                            <tr><td>IT</td><td>93</td><td>135</td><td>129</td><td>140</td></tr>
+                            <tr><td>CSM</td><td>277</td><td>233</td><td>204</td><td>207</td></tr>
+                            <tr><td>CSD</td><td>189</td><td>241</td><td>203</td><td>208</td></tr>
+                            <tr class="fw-bold"><td>Total</td><td>1141</td><td>1295</td><td>1181</td><td>1217</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==========================
+             MIDDLE COLUMN
+        =========================== -->
+        <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-2">
+
+            <!-- Examination Notifications -->
+            <div class="card border-danger mb-2">
+                <div class="card-header bg-danger bg-opacity-25 text-danger fw-bold text-center">
+                    Examination Notifications
+                </div>
+                <div class="card-body p-1">
+                    <table class="table table-bordered border-danger mb-0">
+                        <tbody>
+                             <tr>
+                                <td>Notification for B Tech III Year II sem Regular & Supply and I Sem Supply -APRIL 2026</td>
+                                <td class="text-center">
+                                    <a href="Notifications/2025-26/Notification for B Tech III Year II sem Regular & Supply and I Sem Supply -APRIL 2026.pdf"
+                                       target="_blank"><i class="fa-solid fa-download"></i></a>
+                                </td>
+				</tr>
+				<tr>
+                                <td>SPECIAL SUPPLEMENTARY EXAMINATION NOTIFICATION MARCH -2026</td>
+                                <td class="text-center">
+                                    <a href="Notifications/2025-26/SPECIAL SUPPLEMENTARY EXAMINATION NOTIFICATION MARCH -2026.pdf"
+                                       target="_blank"><i class="fa-solid fa-download"></i></a>
+                                </td>
+				</tr>
+				<tr>
+                                <td>B.Tech I Semester CBT Exam Notifications Jan-2026</td>
+                                <td class="text-center">
+                                    <a href="Notifications/2025-26/B.TECH I SEMESTER CBT NOTIFICATION JAN-2026.pdf"
+                                       target="_blank"><i class="fa-solid fa-download"></i></a>
+                                </td>
+                            </tr>
+							 <tr>
+                                <td>B.Tech M.Tech MBA Specail Supplementary(One Time Chance)– March 2026</td>
+                                <td class="text-center">
+                                    <a href="Notifications/2025-26/BTECH MBA M.TECH ONE TIME CHANCE NOTIFICATION.pdf"
+                                       target="_blank"><i class="fa-solid fa-download"></i></a>
+                                </td>
+                            </tr>
+							 <tr>
+                                <td>MBA II-I Regular & Supply, II-II Supply – Jan 2026</td>
+                                <td class="text-center">
+                                    <a href="Notifications/2025-26/MBA II-I REG&SUPPLY AND II-II SUPPLY NOTIFICATION.pdf"
+                                       target="_blank"><i class="fa-solid fa-download"></i></a>
+                                </td>
+                            </tr>
+							 <tr>
+                                <td>M.Tech II-I Regular & Supply, II-II Supply – Jan 2026</td>
+                                <td class="text-center">
+                                    <a href="Notifications/2025-26/M.TECH II-IREG&SUPPLY AND II-II SUPPLY NOTIFICATION.pdf"
+                                       target="_blank"><i class="fa-solid fa-download"></i></a>
+                                </td>
+                            </tr>
+							<tr>
+                                <td>B.Tech I-I Regular & Supply, I-II Supply – Jan 2026</td>
+                                <td class="text-center">
+                                    <a href="Notifications/2025-26/B.TECH I YEAR I SEM REG & SUPPLY, II SEM SUPPLY NOTIFICATION JAN-2026.pdf"
+                                       target="_blank"><i class="fa-solid fa-download"></i></a>
+                                </td>
+                            </tr>
+							
+                            <tr>
+                                <td colspan="2" class="text-danger text-end fw-bold py-2">
+                                    <a href="notifications.php" target="_blank" class="text-danger text-decoration-none">More</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Academic Calendars -->
+            <div class="card border-warning mb-2">
+                <div class="card-header bg-warning bg-opacity-25 text-warning fw-bold text-center">
+                    Academic Calendars
+                </div>
+                <div class="card-body p-1">
+                    <table class="table table-bordered border-warning mb-0">
+                        <tbody>
+                            <tr>
+                                <td>B.Tech I Year I Sem & II Sem (A.Y. 2025-26)</td>
+                                <td class="text-center">
+                                    <a href="Academics/Academic_Calendars/2025-26/B.Tech I Year I Sem & II Sem (A.Y. 2025-26).pdf" target="_blank">
+                                        <i class="fa-solid fa-download"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>B.Tech II Year I Sem & II Sem (A.Y. 2025-26)</td>
+                                <td class="text-center">
+                                    <a href="Academics/Academic_Calendars/2025-26/B.Tech II Year I Sem & II Sem (A.Y. 2025-26).pdf" target="_blank">
+                                        <i class="fa-solid fa-download"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>B.Tech III Year I Sem & II Sem (A.Y. 2025-26)</td>
+                                <td class="text-center">
+                                    <a href="Academics/Academic_Calendars/2025-26/B.Tech III Year I Sem & II Sem (A.Y. 2025-26).pdf" target="_blank">
+                                        <i class="fa-solid fa-download"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>B.Tech IV Year I Sem & II Sem (A.Y. 2025-26)</td>
+                                <td class="text-center">
+                                    <a href="Academics/Academic_Calendars/2025-26/B.Tech IV Year I Sem & II Sem (A.Y. 2025-26).pdf" target="_blank">
+                                        <i class="fa-solid fa-download"></i>
+                                    </a>
+                                </td>
+                            </tr>
+							<tr>
+                                <td>M.Tech I Year I Sem & II Sem (A.Y. 2025-26)</td>
+                                <td class="text-center">
+                                    <a href="Academics/Academic_Calendars/2025-26/M.Tech MBA I Year I Sem & II Sem -(A.Y 2025-26).pdf" target="_blank">
+                                        <i class="fa-solid fa-download"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>M.Tech II Year I Sem & II Sem (A.Y. 2025-26)</td>
+                                <td class="text-center">
+                                    <a href="Academics/Academic_Calendars/2025-26/M. Tech II Year  I Sem & II Sem -(A.Y.2025-26).pdf" target="_blank">
+                                        <i class="fa-solid fa-download"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>MBA I Year I Sem & II Sem (A.Y. 2025-26)</td>
+                                <td class="text-center">
+                                    <a href="Academics/Academic_Calendars/2025-26/M.Tech MBA I Year I Sem & II Sem -(A.Y 2025-26).pdf" target="_blank">
+                                        <i class="fa-solid fa-download"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>MBA II Year I Sem & II Sem (A.Y. 2025-26)</td>
+                                <td class="text-center">
+                                    <a href="Academics/Academic_Calendars/2025-26/MBA II-Year-I Sem & II Sem (A.Y.2025-26).pdf" target="_blank">
+                                        <i class="fa-solid fa-download"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="text-end fw-bold py-2">
+                                    <a href="academiccalendars.php" target="_blank" class="text-warning text-decoration-none">More</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==========================
+             RIGHT COLUMN
+        =========================== -->
+        <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-2">
+
+          <!-- Time Tables -->
+<div class="card border-success mb-2">
+    <div class="card-header bg-success bg-opacity-25 text-success fw-bold text-center">
+        Examination Time Tables
+    </div>
+
+    <div class="card-body p-1">
+        <table class="table table-bordered border-success mb-0">
+            <tbody>
+
+                <!-- 1 -->
+                <tr>
+                    <td>Special Supplementary (One-Time Chance) External Examination Time Tables - March 2026</td>
+                    <td class="text-center">
+                        <a href="Timetables/2025-26/Special(One-Time Chance) Supplementary End Examination Time Tables-March 2026.pdf" target="_blank">
+                            <i class="fa-solid fa-download"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- 2 -->
+                <tr>
+                    <td>M.TECH I-I REG AND SUPPLY & I-II SUPPLY EXTERNAL EXAM TIME TABLE - MAR 2026</td>
+                    <td class="text-center">
+                        <a href="Timetables/2025-26/M.TECH I-I REG AND SUPPLY & I-II SUPPLY EXTERNAL EXAM TIME TABLE-MAR 2026.pdf" target="_blank">
+                            <i class="fa-solid fa-download"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- 3 -->
+                <tr>
+                    <td>MBA I-I REG AND SUPPLY & I-II SUPPLY EXTERNAL TIME TABLE - MAR 2026</td>
+                    <td class="text-center">
+                        <a href="Timetables/2025-26/MBA I-I REG AND SUPPLY & I-II SUPPLY EXTERNAL TIME TABLE-MAR 2026.pdf" target="_blank">
+                            <i class="fa-solid fa-download"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- 4 -->
+                <tr>
+                    <td>B.Tech, M.Tech, MBA Rescheduled Examination Dates (Circular)</td>
+                    <td class="text-center">
+                        <a href="Timetables/2025-26/RESCHEDULE TIMETABLE CIRCULAR.pdf" target="_blank">
+                            <i class="fa-solid fa-download"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- 5 -->
+                <tr>
+                    <td>B.Tech I Sem Reg & Supply / II Sem Supply – Jan 2026</td>
+                    <td class="text-center">
+                        <a href="Timetables/2025-26/B.TECH I YEAR I SEM REG & SUPPLY, II SEM SUPPLY TIME TABLE JAN-2026.pdf" target="_blank">
+                            <i class="fa-solid fa-download"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- More Button -->
+                <tr>
+                    <td colspan="2" class="text-end text-success fw-bold py-2">
+                        <a href="timetables.php" 
+                           target="_blank"
+                           class="text-success text-decoration-none">
+                            More
+                        </a>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+            <!-- Syllabus -->
+            <div class="card border-secondary mb-2">
+                <div class="card-header bg-secondary bg-opacity-25 text-secondary fw-bold text-center">
+                    Syllabus
+                </div>
+                <div class="card-body p-1">
+                    <table class="table table-bordered border-secondary mb-0">
+                        <tbody>
+                            <tr><td>CIVIL - R25</td><td class="text-center"><a href="Syllabus/R25/I YEAR CIVIL.pdf" target="_blank"><i class="fa-solid fa-download"></i></a></td></tr>
+                            <tr><td>EEE - R25</td><td class="text-center"><a href="Syllabus/R25/I YEAR EEE.pdf" target="_blank"><i class="fa-solid fa-download"></i></a></td></tr>
+                            <tr><td>ECE - R25</td><td class="text-center"><a href="Syllabus/R25/I YEAR ECE.pdf" target="_blank"><i class="fa-solid fa-download"></i></a></td></tr>
+                            <tr><td>CSE - R25</td><td class="text-center"><a href="Syllabus/R25/I YEAR CSE.pdf" target="_blank"><i class="fa-solid fa-download"></i></a></td></tr>
+                            <tr><td>IT - R25</td><td class="text-center"><a href="Syllabus/R25/I YEAR IT.pdf" target="_blank"><i class="fa-solid fa-download"></i></a></td></tr>
+                            <tr><td>CSM - R25</td><td class="text-center"><a href="Syllabus/R25/I YEAR CSM.pdf" target="_blank"><i class="fa-solid fa-download"></i></a></td></tr>
+                            <tr><td>CSD - R25</td><td class="text-center"><a href="Syllabus/R25/I YEAR CSD.pdf" target="_blank"><i class="fa-solid fa-download"></i></a></td></tr>
+                            <tr>
+                                <td colspan="2" class="text-end fw-bold py-2">
+                                    <a href="syllabus.php" target="_blank" class="text-success text-decoration-none">More</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div> <!-- row -->
+</div> <!-- container -->
+
+
+        
+    </main>
+
+    <footer class="footer mt-auto py-0"><div class="container-fluid py-4 bg-secondary fs-6">
+	<div class="row">			
+		<div class="w-100 text-center mb-4"><p class="text-white m-0">Copyright &copy; 2026 <strong>TKR College of Engineering &amp; Technology,&nbsp; Examination Section</strong>, All Rights Reserved. Thanks for Visiting (<a class="small text-white text-decoration-none" href="https://tkrcetexams.com/">TKRCETEXAMS </a>)K9 Exam Portal!</p>
+		<p><center><span class="w-100 fw-semibold text-center " style="color:#00ff00">Developer & Maintenance -Dr A. Pradeep, Under Guidance of Esteemed Designer Mr. A. Srinivas Reddy </span></center></p>
+		</div>
+		<div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center text-white mb-3"><span class="fw-semibold fs-8">Academics</span>
+			<ul class="list-group list-group-flush border-0">
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="regulations.php">Regulations</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="acm.php">Academic Council Minutes</a></li>
+				<li class="list-group-item border-0 bg-secondary  py-0"><a class="small text-white text-decoration-none" href="promotionrules.php">Promotion Rules</a></li>								
+				<li class="list-group-item border-0 bg-secondary  py-0"><a class="small text-white text-decoration-none" href="Notifications/CLASS ROOMS LIST 2024-25.pdf.php">Class Rooms List</a></li>
+				<li class="list-group-item border-0 bg-secondary  py-0"><a class="small text-white text-decoration-none" href="photos.php">Photos</a></li>
+				<li class="list-group-item border-0 bg-secondary  py-0"><a class="small text-white text-decoration-none" href="approvals.php">Approvals</a></li>
+			</ul>
+		</div>
+		<div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center text-white mb-3"><span class="fw-semibold fs-8">Pre Exams</span>
+			<ul class="list-group list-group-flush border-0">
+				<li class="list-group-item border-0 bg-secondary  py-0"><a class="small text-white text-decoration-none" href="subjectcodes.php">Subject Codes</a></li>
+				<li class="list-group-item border-0 bg-secondary  py-0"><a class="small text-white text-decoration-none" href="rolllist.php">Roll List</a></li>
+				<li class="list-group-item border-0 bg-secondary  py-0"><a class="small text-white text-decoration-none" href="detained.php">Detained List</a></li>
+				<li class="list-group-item border-0 bg-secondary  py-0"><a class="small text-white text-decoration-none" href="promotionlist.php">Promotion List</a></li>
+				<li class="list-group-item border-0 bg-secondary  py-0"><a class="small text-white text-decoration-none" href="dropout.php">Dropout List</a></li>
+			</ul>
+		</div>
+		<!--<div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center text-white mb-3"><span class="fw-semibold fs-8">Internal Marks</span>
+			<ul class="list-group list-group-flush border-0">
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="civilim.php">CE</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="eeeim.php">EEE</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="mechim.php">ME</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="eceim.php">ECE</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="cseim.php">CSE</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="itim.php">IT</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="csmim.php">CSM</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="csdim.php">CSD</a></li>
+			</ul>
+		</div>-->
+		<div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center text-white mb-3"><span class="fw-semibold fs-8">On Exams</span>
+			<ul class="list-group list-group-flush border-0">
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="moderation.php">Moderation</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="On_Exams/Examrules.php">Examination Rules</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="On_Exams/MPRules.php">MP Rules</a></li>				
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="questionpapers.php" target="_blank">Question Papers</a></li>				
+			</ul>
+		</div>
+		<!--<div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center text-white mb-3"><span class="fw-semibold fs-8">Regular T-Sheets</span>
+			<ul class="list-group list-group-flush border-0">
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="civilrt.php">CE</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="eeert.php">EEE</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="mechrt.php">ME</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="ecert.php">ECE</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="csert.php">CSE</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="itrt.php">IT</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="csmrt.php">CSM</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="csdrt.php">CSD</a></li>
+			</ul>
+		</div>
+		<div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center text-white mb-3"><span class="fw-semibold fs-8">Supply T-Sheets</span>
+			<ul class="list-group list-group-flush border-0">
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="24batchsup.php">2024</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="23batchsup.php">2023</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="22batchsup.php">2022</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="21batchsup.php">2021</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="20batchsup.php">2020</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="19batchsup.php">2019</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="18batchsup.php">2018</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="17batchsup.php">2017</a></li>
+			</ul>
+		</div>-->
+		<div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center text-white mb-3"><span class="fw-semibold fs-8">Post Exams</span>
+			<ul class="list-group list-group-flush border-0">
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="http://192.168.14.150/PostExams/index.php">EQWM (Intranet Link)</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="pqp.php">Previous Question Papers</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="On_Exams/rcrvcvguidelines.php">RCRVCV Guidelines</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="tracking.php">Certificate Tracking</a></li>
+			</ul>
+		</div>
+		<div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center text-white mb-3"><span class="fw-semibold fs-8">Reports</span>
+			<ul class="list-group list-group-flush border-0">
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="yearwiseanalysis.php">Yearwise Analysis</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="cosolidatedr.php">Consolidate Report</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="areports.php">Annual Reports</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="https://docs.google.com/spreadsheets/d/1Y1Yy6aQj0hdrE9zTTg-E43zpYu3xQOPP/edit?usp=sharing&ouid=111840932228276110073&rtpof=true&sd=true" target="_blank">Exam Dates</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none"  href="creditsreport.php">Credits Report</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none"  href="backlogs.php">Backlogs</a></li>
+			</ul>
+		</div>
+		<!--<div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center text-white mb-3"><span class="fw-semibold fs-8">PC/TC Track</span>
+			<ul class="list-group list-group-flush border-0">
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="https://docs.google.com/spreadsheets/d/1__sWVSGGEmLRpUUUK9v0FM-Y6gtQLvcF/edit?usp=sharing&ouid=111840932228276110073&rtpof=true&sd=true">2020 Batch</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="https://docs.google.com/spreadsheets/d/1lL-aE2GIYYEMACfbdyDPASRq5VJmx6-e/edit?usp=sharing&ouid=111840932228276110073&rtpof=true&sd=true" target="_blank">19 Batch</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="https://docs.google.com/spreadsheets/d/1SJcj2Ibw7zpEJk3mjf_dJL82OpymEndi/edit?usp=sharing&ouid=111840932228276110073&rtpof=true&sd=true" target="_blank">18 Batch</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="https://docs.google.com/spreadsheets/d/1bWHNtBJJ5c9M2yG1zmCOS-4CkTQgDNN1/edit?usp=sharing&ouid=111840932228276110073&rtpof=true&sd=true" target="_blank">17 Batch</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="https://docs.google.com/spreadsheets/d/1kbzQX3w7C7snJEqC3ikzl73hSqNV_Z7kn62sPivuRTk/edit?usp=sharing" target="_blank">Transcripts</a></li>				
+			</ul>
+		</div>-->
+		<div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center text-white mb-3"><span class="fw-semibold fs-8">Downloads</span>
+			<ul class="list-group list-group-flush border-0">
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="Downloads/invigilation-duty-adjustment-form.pdf" target="_blank">Invigilation Adjust Form</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="Downloads/TKRCETFORM-5D.pdf" target="_blank">Grace Application(R20)</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="Downloads/TKRCET-FORM-5C-2.pdf" target="_blank">Grace Application(R18)</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="Downloads/undertaking-for-grace.pdf" target="_blank">Under Taking(Grace)</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none"  href="Downloads/NAME-CORRECTION-APPLICATION-FORM.pdf" target="_blank">Profile Correction Form</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none"  href="Downloads/Duplicate-Memo-Application.pdf" target="_blank">Duplicate Memo Application Form</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none"  href="Downloads/Transcripts-Application-Form.pdf" target="_blank">Transcript Application Form</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none"  href="Downloads/PC-APPLICATION.pdf" target="_blank">PC Application</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none"   href="Downloads/TC-APPLICATION-FORM.pdf" target="_blank">TC Application</a></li>				
+			</ul>
+		</div>
+		<div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center text-white mb-3"><span class="fw-semibold fs-8">About Us</span>
+			<ul class="list-group list-group-flush border-0">
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="aboutus.php" target="_blank">To Know About Us</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="contactus.php" target="_blank">For More Details Contact Us </a></li>
+			</ul>
+		</div>	
+		<div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center text-white mb-3"><span class="fw-semibold fs-8">Results</span>
+			<ul class="list-group list-group-flush border-0">				
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="http://192.168.14.150:1352/Results" target="_blank">Click here For Results (Internal Link) </a></li>
+				<li class="list-group-item border-0 bg-secondary py-0 small">(Intranet Link within the Campus)</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="http://k9examportal:1352/Results" target="_blank">Click here For Results (Internal Link) </a></li>
+				<li class="list-group-item border-0 bg-secondary py-0 small">(Intranet Link within the Exam Branch)</a></li>
+				<li class="list-group-item border-0 bg-secondary py-0"><a class="small text-white text-decoration-none" href="http://k9examportal/PostExams" target="_blank">Clickhere PostExams (Internal Link) </a></li>
+				<li class="list-group-item border-0 bg-secondary py-0 small">(Intranet Link within the Exam Branch)</a></li>
+			</ul>
+		</div>	
+	</div>
+</div>
+  
+   
+</footer>
+
+    <!-- ===========================
+  Core JS Libraries
+=========================== -->
+
+<!-- jQuery (must load first, no defer) -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+
+<!-- Bootstrap Bundle (safe to defer) -->
+<script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- jQuery UI (choose ONLY 1 version — your newest version kept) -->
+<script defer src="https://cdn.jsdelivr.net/npm/jquery-ui@1.14.1/dist/jquery-ui.min.js"></script>
+
+<!-- ===========================
+  Navigation / UI Enhancements
+=========================== -->
+
+<!-- SmartMenus -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.2.1/jquery.smartmenus.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.2.1/addons/bootstrap-4/jquery.smartmenus.bootstrap-4.min.js"></script>
+
+<!-- FontAwesome Icons -->
+<script defer src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/js/all.min.js"></script>
+
+<!-- ===========================
+  Custom Inline Script
+=========================== -->
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      $(".collapsible").on("click", function () {
+          $(this).next(".content").slideToggle();
+      });
+  });
+</script></body>
+</html>

@@ -1,0 +1,9 @@
+.venv/
+venv/
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+pyright_output.txt
+crash_debug.log
+data/

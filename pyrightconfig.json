@@ -1,0 +1,26 @@
+{
+  "pythonVersion": "3.11",
+  "executionEnvironments": [
+    {
+      "root": "backend",
+      "extraPaths": [
+        "backend/venv/Lib/site-packages",
+        "backend",
+        "."
+      ]
+    },
+    {
+      "root": "proctoring",
+      "extraPaths": [
+        "proctoring/venv/Lib/site-packages",
+        "proctoring",
+        "."
+      ]
+    }
+  ],
+  "extraPaths": [
+    ".",
+    "backend/venv/Lib/site-packages",
+    "proctoring/venv/Lib/site-packages"
+  ]
+}
