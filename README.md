@@ -2,55 +2,41 @@
 
 A comprehensive academic system for TKR College of Engineering and Technology, featuring an AI chatbot, quiz generator, and proctoring service.
 
+## GitHub Repository
+The official codebase is now hosted at:
+`https://github.com/ChandanaBoga/AI_BASED_STUDENT_LEARNING_AND_EXAM_PREPARATION_PLATFORM.git`
+
+## Key Improvements
+- **AI Quiz Generation**: Robust regex-based parsing ensures valid JSON extraction, resolving previous formatting errors.
+- **Chatbot Accuracy**: Expanded knowledge base context and department-specific trigger keywords (e.g., HOD of AIML) for highly accurate responses.
+- **Integrated Proctoring**: Moondream-based distraction analysis for secure academic assessments.
+
 ## Setup and Installation
 
-### 1. Open Terminal and Navigate to Project
+### 1. Project Directory
 Open PowerShell or Command Prompt as Administrator and run:
 ```powershell
 cd "C:\Program Files\webapp"
 ```
 
-### 2. Activate Virtual Environment (Optional/Debugging)
-To manually enter the environment used by the AI service:
-```powershell
-# PowerShell
-.\backend\venv\Scripts\Activate.ps1
-
-# Command Prompt
-backend\venv\Scripts\activate.bat
-```
-
-### 3. Install Dependencies
-If you need to refresh the packages:
-```powershell
-pip install -r requirements.txt
-```
-
-### 4. Setup AI Models (Ollama)
-Ensure **Ollama** is installed and running, then pull the required model:
+### 2. Setup AI Models
+Ensure **Ollama** is installed and running, then pull the required models:
 ```powershell
 ollama pull llama3.2:3b
+ollama pull moondream:1.8b
 ```
 
-## How to Run
-
-The easiest way to start all services (Frontend, AI Service, and Proctoring) is to use the `backend.py` script.
-
-1. **Start all services**:
-   ```powershell
-   python.exe backend.py
-   ```
-2. **Access the Application**:
-   - Open your web browser and navigate to:
-     `http://localhost:8080/combined_app.html`
+### 3. Run the Application
+The primary orchestrator for all services (Foreground, AI, and Proctoring) is `launcher_app.py`:
+```powershell
+python launcher_app.py
+```
 
 ## Service Overview
-
-- **Frontend Server**: http://localhost:8080 (Served via Python's `http.server`)
-- **AI Service (FastAPI)**: http://localhost:8001 (Handles Chatbot and Quiz)
-- **Proctoring Service**: http://localhost:5050 (Moondream-based distraction analysis)
+- **Main Portal**: `http://localhost:8001/` (Handles AI Chatbot and Quiz)
+- **Proctoring Engine**: `http://localhost:5050` (Active during AI Quiz)
+- **Asset Portability**: All resources are version-controlled, including the `data/` knowledge base and `scripts/` utility folder.
 
 ## Troubleshooting
-
-- **Ollama Connection**: Ensure Ollama is running before starting the services.
-- **Python Interpreter**: If using VS Code, ensure the `backend/venv` interpreter is selected for the `ai_service.py` file to avoid import errors.
+- **Ollama Status**: The AI service requires Ollama to be active. Verification can be done by running `ollama list`.
+- **Environment**: If errors occur, ensure dependencies are installed via `pip install -r requirements.txt`.
