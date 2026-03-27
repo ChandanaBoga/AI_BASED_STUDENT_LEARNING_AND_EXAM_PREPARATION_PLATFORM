@@ -841,24 +841,41 @@
                         </div>
                     </div>
 
-                    <div class="glass-card p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-primary/5 border border-blue-100 dark:border-blue-900/30 relative min-h-[500px] flex flex-col">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center gap-3">
-                                <div class="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                                    <span class="material-symbols-outlined">description</span>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-slate-900 dark:text-white">Active Note Pad</h3>
-                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest" id="last-saved-time">All changes saved</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-[650px]">
+                        <!-- Note Selection Sidebar -->
+                        <div class="lg:col-span-3 flex flex-col gap-4">
+                            <button onclick="createNewNote()" class="w-full py-4 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/20 hover:bg-primary-dark transition-all active:scale-95 flex items-center justify-center gap-3 group text-sm">
+                                <span class="material-symbols-outlined group-hover:rotate-90 transition-transform">add_circle</span>
+                                New Note
+                            </button>
+                            
+                            <div class="glass-card flex-1 rounded-[2rem] p-4 overflow-hidden flex flex-col border border-blue-100 dark:border-blue-900/20">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 mb-4">Saved Notes</p>
+                                <div id="notes-list" class="flex-1 overflow-y-auto space-y-2 no-scrollbar pr-1">
+                                    <!-- Dynamic note items -->
                                 </div>
                             </div>
-                            <button onclick="clearNotes()" class="px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all flex items-center gap-2">
-                                <span class="material-symbols-outlined text-lg">delete</span>
-                                Clear All
-                            </button>
                         </div>
-                        
-                        <textarea id="personal-notes-area" class="flex-1 w-full bg-blue-50/30 dark:bg-slate-900/40 border-2 border-dashed border-blue-100 dark:border-blue-900/20 rounded-[2rem] p-8 text-slate-700 dark:text-slate-200 focus:border-primary focus:ring-0 transition-all resize-none font-medium leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Start typing your points here..."></textarea>
+
+                        <!-- Note Editor Area -->
+                        <div class="lg:col-span-9 glass-card p-8 md:p-10 rounded-[2.5rem] shadow-2xl shadow-primary/5 border border-blue-100 dark:border-blue-900/30 flex flex-col">
+                            <div class="flex items-center justify-between mb-8">
+                                <div class="flex-1 mr-6">
+                                    <input type="text" id="active-note-title" class="w-full bg-transparent border-none text-2xl font-black text-slate-900 dark:text-white focus:ring-0 p-0 placeholder:text-slate-300 dark:placeholder:text-slate-700" placeholder="Untited Note">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1" id="last-saved-time">No active note selected</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <button onclick="saveActiveNote()" class="size-11 rounded-xl bg-blue-50 dark:bg-slate-800 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-sm border border-blue-100 dark:border-blue-900/30 group" title="Manual Save">
+                                        <span class="material-symbols-outlined group-active:scale-90">save</span>
+                                    </button>
+                                    <button onclick="deleteActiveNote()" class="size-11 rounded-xl bg-red-50 dark:bg-red-900/10 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm border border-red-100 dark:border-red-900/20" title="Delete Note">
+                                        <span class="material-symbols-outlined">delete_forever</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <textarea id="personal-notes-area" class="flex-1 w-full bg-blue-50/20 dark:bg-slate-900/30 border-2 border-dashed border-blue-100/50 dark:border-blue-900/10 rounded-[2rem] p-8 text-slate-700 dark:text-slate-200 focus:border-primary/30 focus:ring-0 transition-all resize-none font-medium leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Start typing your points here..."></textarea>
+                        </div>
                     </div>
                 </section>
                 <section id="page2" class="content-section p-6 md:p-10 max-w-7xl mx-auto w-full space-y-10">
@@ -1334,41 +1351,168 @@
             syllabusSearch?.addEventListener('input', filterSyllabus);
         }
 
+        let notes = [];
+        let activeNoteId = null;
+
         function setupNotes() {
             const notesArea = document.getElementById('personal-notes-area');
-            const lastSavedText = document.getElementById('last-saved-time');
-            let saveTimeout;
+            const noteTitle = document.getElementById('active-note-title');
+            
+            // Load from localStorage
+            const saved = localStorage.getItem('btech_box_notes_v2');
+            if (saved) {
+                notes = JSON.parse(saved);
+                activeNoteId = localStorage.getItem('btech_box_active_note_id');
+            }
 
-            if (notesArea) {
-                // Load existing notes
-                const savedNotes = localStorage.getItem('btech_box_personal_notes');
-                if (savedNotes) {
-                    notesArea.value = savedNotes;
+            if (notes.length === 0) {
+                // Create a default note if empty
+                createNewNote("My First Note", "Welcome to your personal notes! You can create multiple notes using the sidebar.");
+            } else {
+                renderNotesList();
+                if (activeNoteId) {
+                    const activeNote = notes.find(n => n.id == activeNoteId);
+                    if (activeNote) {
+                        displayNote(activeNote);
+                    } else {
+                        switchNote(notes[0].id);
+                    }
+                } else {
+                    switchNote(notes[0].id);
                 }
+            }
 
-                // Auto-save on input
-                notesArea.addEventListener('input', () => {
-                    lastSavedText.textContent = 'Saving...';
-                    if (saveTimeout) clearTimeout(saveTimeout);
-                    
-                    saveTimeout = setTimeout(() => {
-                        localStorage.setItem('btech_box_personal_notes', notesArea.value);
-                        const now = new Date();
-                        lastSavedText.textContent = `Last saved at ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
-                    }, 1000);
-                });
+            // Auto-save listeners
+            let saveTimeout;
+            const autoSave = () => {
+                const lastSavedText = document.getElementById('last-saved-time');
+                if (lastSavedText) lastSavedText.textContent = 'Saving...';
+                
+                if (saveTimeout) clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(() => {
+                    saveActiveNote(true);
+                }, 1000);
+            };
+
+            notesArea?.addEventListener('input', autoSave);
+            noteTitle?.addEventListener('input', autoSave);
+        }
+
+        function createNewNote(title = "Untitled Note", content = "") {
+            const newNote = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                lastModified: new Date().toISOString()
+            };
+            notes.unshift(newNote); // Add to beginning
+            saveToStorage();
+            renderNotesList();
+            switchNote(newNote.id);
+        }
+
+        function renderNotesList() {
+            const listContainer = document.getElementById('notes-list');
+            if (!listContainer) return;
+
+            listContainer.innerHTML = notes.map(note => `
+                <div onclick="switchNote(${note.id})" class="note-item p-4 rounded-xl cursor-pointer transition-all border border-transparent ${activeNoteId == note.id ? 'bg-primary/10 border-primary/20 shadow-sm' : 'hover:bg-blue-50/50 dark:hover:bg-primary/5'}">
+                    <h4 class="font-bold text-sm truncate ${activeNoteId == note.id ? 'text-primary' : 'text-slate-700 dark:text-slate-300'}">${note.title || 'Untitled'}</h4>
+                    <p class="text-[10px] text-slate-400 mt-1">${new Date(note.lastModified).toLocaleDateString()}</p>
+                </div>
+            `).join('');
+        }
+
+        function displayNote(note) {
+            const notesArea = document.getElementById('personal-notes-area');
+            const noteTitle = document.getElementById('active-note-title');
+            const lastSavedText = document.getElementById('last-saved-time');
+
+            if (notesArea) notesArea.value = note.content;
+            if (noteTitle) noteTitle.value = note.title;
+            if (lastSavedText) {
+                const date = new Date(note.lastModified);
+                lastSavedText.textContent = `Last saved at ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
             }
         }
 
-        function clearNotes() {
-            if (confirm('Are you sure you want to clear all your notes? This cannot be undone.')) {
-                const notesArea = document.getElementById('personal-notes-area');
-                const lastSavedText = document.getElementById('last-saved-time');
-                if (notesArea) {
-                    notesArea.value = '';
-                    localStorage.removeItem('btech_box_personal_notes');
-                    lastSavedText.textContent = 'All notes cleared';
+        function switchNote(id) {
+            // Save current before switching
+            if (activeNoteId) saveActiveNote(true);
+            
+            activeNoteId = id;
+            localStorage.setItem('btech_box_active_note_id', id);
+            
+            const note = notes.find(n => n.id == id);
+            if (note) {
+                displayNote(note);
+                renderNotesList();
+            }
+        }
+
+        function saveActiveNote(isAutoSave = false) {
+            if (!activeNoteId) return;
+
+            const notesArea = document.getElementById('personal-notes-area');
+            const noteTitle = document.getElementById('active-note-title');
+            const lastSavedText = document.getElementById('last-saved-time');
+
+            const index = notes.findIndex(n => n.id == activeNoteId);
+            if (index !== -1) {
+                notes[index].content = notesArea ? notesArea.value : notes[index].content;
+                notes[index].title = noteTitle ? noteTitle.value : notes[index].title;
+                notes[index].lastModified = new Date().toISOString();
+                
+                saveToStorage();
+                
+                if (!isAutoSave) {
+                    renderNotesList();
+                    // Visual feedback for manual save
+                    if (lastSavedText) {
+                        const originalText = lastSavedText.textContent;
+                        lastSavedText.textContent = '✅ Saved successfully!';
+                        lastSavedText.classList.add('text-green-500');
+                        setTimeout(() => {
+                            lastSavedText.classList.remove('text-green-500');
+                            const now = new Date();
+                            lastSavedText.textContent = `Last saved at ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+                        }, 2000);
+                    }
                 }
+            }
+        }
+
+        function deleteActiveNote() {
+            if (!activeNoteId) return;
+            if (!confirm('Delete this note permanentely?')) return;
+
+            notes = notes.filter(n => n.id != activeNoteId);
+            saveToStorage();
+            
+            if (notes.length > 0) {
+                switchNote(notes[0].id);
+            } else {
+                activeNoteId = null;
+                const notesArea = document.getElementById('personal-notes-area');
+                const noteTitle = document.getElementById('active-note-title');
+                if (notesArea) notesArea.value = '';
+                if (noteTitle) noteTitle.value = '';
+                document.getElementById('last-saved-time').textContent = 'No active note';
+                createNewNote("My New Note", ""); // Auto-create one if all deleted
+            }
+            renderNotesList();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('btech_box_notes_v2', JSON.stringify(notes));
+        }
+
+        function clearNotes() {
+            if (confirm('Are you sure you want to clear ALL your notes? This cannot be undone.')) {
+                notes = [];
+                localStorage.removeItem('btech_box_notes_v2');
+                localStorage.removeItem('btech_box_active_note_id');
+                setupNotes();
             }
         }
 
