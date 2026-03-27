@@ -6,6 +6,7 @@ A comprehensive academic system for TKR College of Engineering and Technology, f
 - **AI Quiz Generation**: Robust regex-based parsing ensures valid JSON extraction, resolving previous formatting errors.
 - **Chatbot Accuracy**: Expanded knowledge base context and department-specific trigger keywords (e.g., HOD of AIML) for highly accurate responses.
 - **Integrated Proctoring**: Moondream-based distraction analysis for secure academic assessments.
+- **Global Search Bar**: Real-time results dropdown for instant access to quizzes, syllabi, notes, and academic resources.
 
 ## Setup and Installation
 
