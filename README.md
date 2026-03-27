@@ -2,10 +2,6 @@
 
 A comprehensive academic system for TKR College of Engineering and Technology, featuring an AI chatbot, quiz generator, and proctoring service.
 
-## GitHub Repository
-The official codebase is now hosted at:
-`https://github.com/ChandanaBoga/AI_BASED_STUDENT_LEARNING_AND_EXAM_PREPARATION_PLATFORM.git`
-
 ## Key Improvements
 - **AI Quiz Generation**: Robust regex-based parsing ensures valid JSON extraction, resolving previous formatting errors.
 - **Chatbot Accuracy**: Expanded knowledge base context and department-specific trigger keywords (e.g., HOD of AIML) for highly accurate responses.
