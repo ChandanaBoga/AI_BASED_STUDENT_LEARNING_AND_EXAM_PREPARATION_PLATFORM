@@ -6,6 +6,8 @@
     <title>Btech Box - All-in-One SPA</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="assets/quiz_data.js"></script>
+    <!-- Monaco Editor CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
     <script id="tailwind-config">
@@ -74,11 +76,15 @@
             scrollbar-width: none;
         }
         .content-section {
-            display: none;
+            display: none !important;
         }
         .content-section.active {
-            display: block;
-        }        /* Removed old hardcoded background logo */
+            display: block !important;
+        }
+        .content-section.active.flex {
+            display: flex !important;
+        }
+        /* Removed old hardcoded background logo */
         body {
             background-attachment: fixed;
         }
@@ -208,7 +214,11 @@
                 </a>
                 <a class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all" href="#notes" data-page="notes">
                     <span class="material-symbols-outlined">edit_note</span>
-                    <span>Notes</span>
+                    <span>Daily Notes</span>
+                </a>
+                <a class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all" href="#practice-coding" data-page="practice-coding">
+                    <span class="material-symbols-outlined">code</span>
+                    <span>Practice Coding</span>
                 </a>
             </nav>
             <div class="px-4 pb-8">
@@ -226,10 +236,13 @@
                 <div class="flex items-center gap-4 flex-1">
                     <div class="relative w-full max-w-lg">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-                        <input class="w-full pl-12 pr-4 py-2.5 bg-blue-50/50 dark:bg-slate-900/50 border-blue-100/50 dark:border-blue-900/20 rounded-2xl text-sm focus:ring-4 focus:ring-primary/20 transition-all placeholder:text-slate-400" id="global-search" placeholder="Search resources..." type="text">
+                        <input class="w-full pl-12 pr-4 py-2.5 bg-blue-50/50 dark:bg-slate-900/50 border-blue-100/50 dark:border-blue-900/20 rounded-2xl text-sm focus:ring-4 focus:ring-primary/20 transition-all placeholder:text-slate-400" id="global-search" placeholder="Search resources..." type="text" autocomplete="off">
+                        <!-- Enhanced Search Results Dropdown -->
+                        <div id="search-results" class="hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-blue-100 dark:border-blue-900/30 rounded-2xl shadow-2xl z-[200] max-h-[400px] overflow-y-auto no-scrollbar animate-in fade-in slide-in-from-top-2">
+                        </div>
                         <!-- Data Unavailable Message -->
                         <div id="search-error" class="hidden absolute top-full mt-2 left-0 right-0 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm p-3 rounded-xl shadow-lg z-[100] text-center font-medium animate-in fade-in slide-in-from-top-2">
-                            <span class="material-symbols-outlined text-sm align-middle mr-1">error</span> Data unavailable
+                            <span class="material-symbols-outlined text-sm align-middle mr-1">error</span> No results found
                         </div>
                     </div>
                 </div>
@@ -543,6 +556,69 @@
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Practice Coding Section -->
+                <section id="practice-coding" class="content-section flex flex-col h-full bg-white dark:bg-[#1e1e1e]">
+                    <div class="p-4 border-b border-blue-100 dark:border-blue-900/30 flex items-center justify-between bg-white dark:bg-ocean-depth/50 backdrop-blur-md sticky top-0 z-10">
+                        <div class="flex items-center gap-4">
+                            <div class="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                                <span class="material-symbols-outlined font-bold">code</span>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-black dark:text-white">Coding Playground</h1>
+                                <p class="text-[10px] text-primary font-black uppercase tracking-widest">Interactive Environment</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="relative group">
+                                <select id="coding-language" class="appearance-none bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-xs font-black px-5 pr-10 py-2.5 ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-primary transition-all">
+                                    <option value="python">Python 3</option>
+                                    <option value="c">C (GCC)</option>
+                                    <option value="java">Java (OpenJDK)</option>
+                                </select>
+                                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-sm">expand_more</span>
+                            </div>
+                            <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
+                            <button id="run-code-btn" class="h-10 px-6 bg-primary text-white text-xs font-black rounded-xl shadow-xl shadow-primary/30 hover:bg-primary-dark transition-all flex items-center gap-2 active:scale-95 group">
+                                <span class="material-symbols-outlined text-sm group-hover:rotate-12 transition-transform">play_arrow</span>
+                                Run Code
+                            </button>
+                            <button id="save-code-btn" class="h-10 px-4 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-primary/5 transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">save</span>
+                                Save
+                            </button>
+                            <button id="open-code-btn" class="h-10 px-4 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-primary/5 transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">folder_open</span>
+                                Snippets
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 flex overflow-hidden">
+                        <!-- Editor Area -->
+                        <div class="w-2/3 h-full border-r border-blue-100 dark:border-blue-900/30 relative bg-[#1e1e1e]">
+                            <div id="monaco-editor-container" class="w-full h-full"></div>
+                            <!-- Language Badge -->
+                            <div id="editor-lang-badge" class="absolute bottom-4 right-6 px-3 py-1.5 bg-black/50 backdrop-blur-md rounded-lg text-[10px] font-black text-white/50 border border-white/10 pointer-events-none uppercase tracking-widest z-10">
+                                Python 3
+                            </div>
+                        </div>
+
+                        <!-- Output Area -->
+                        <div class="w-1/3 h-full flex flex-col bg-slate-950 overflow-hidden">
+                            <div class="px-4 py-2 border-b border-white/5 bg-slate-900/80 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="size-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">System Output</span>
+                                </div>
+                                <button id="clear-output-btn" class="text-[9px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-all">Clear Terminal</button>
+                            </div>
+                            <div id="coding-output" class="flex-1 p-6 font-mono text-xs text-blue-100/70 overflow-y-auto whitespace-pre-wrap selection:bg-primary/30 leading-relaxed scrollbar-thin scrollbar-thumb-white/10">
+                                <span class="text-slate-600 italic">Ready for execution...</span>
                             </div>
                         </div>
                     </div>
@@ -1185,6 +1261,9 @@
 
     <!-- Router & Chat Logic -->
     <script>
+        // Define AI_BASE_URL according to protocol for all scripts to use
+        const AI_BASE_URL = window.location.protocol === 'file:' ? 'http://localhost:8001' : '';
+
         // SPA Routing Logic
         function handleRouting() {
             const hash = window.location.hash || '#dashboard';
@@ -1228,94 +1307,138 @@
             let errorTimeout;
 
             if (globalSearch) {
-                globalSearch.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const term = e.target.value.toLowerCase().trim();
-                        if (!term) return;
-                        
-                        // Clear existing error timeout
-                        if (errorTimeout) clearTimeout(errorTimeout);
+                // Prevent default form submission if any
+                globalSearch.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') e.preventDefault();
+                });
+
+                globalSearch.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase().trim();
+                    const resultsContainer = document.getElementById('search-results');
+                    
+                    if (!term || term.length < 2) {
+                        resultsContainer.classList.add('hidden');
                         searchError.classList.add('hidden');
+                        return;
+                    }
 
-                        // Keyword to section mapping
-                        const sectionMap = {
-                            'dashboard': 'dashboard',
-                            'study': 'study-with-ai',
-                            'ai': 'study-with-ai',
-                            'quiz': 'study-with-ai',
-                            'syllabus': 'syllabus',
-                            'academic': 'academic-resources',
-                            'resources': 'academic-resources',
-                            'papers': 'academic-resources',
-                            'department': 'departments',
-                            'departments': 'departments',
-                            'cse': 'departments',
-                            'it': 'departments',
-                            'ece': 'departments',
-                            'eee': 'departments',
-                            'civil': 'departments',
-                            'csm': 'departments',
-                            'csd': 'departments',
-                            '1st year': 'page1',
-                            'first year': 'page1',
-                            '1st sem': 'page1',
-                            'first sem': 'page1',
-                            '2nd year': 'page2',
-                            'second year': 'page2',
-                            '3rd sem': 'page2',
-                            'third sem': 'page2',
-                            '4th sem': 'page2',
-                            'fourth sem': 'page2',
-                            '3rd year': 'page3',
-                            'third year': 'page3',
-                            '5th sem': 'page3',
-                            'fifth sem': 'page3',
-                            '6th sem': 'page3',
-                            'sixth sem': 'page3',
-                            '4th year': 'page4',
-                            'fourth year': 'page4',
-                            '7th sem': 'page4',
-                            'seventh sem': 'page4',
-                            '8th sem': 'page4',
-                            'eighth sem': 'page4',
-                            'notes': 'notes',
-                            'points': 'notes',
-                            'study notes': 'notes'
-                        };
+                    const searchIndex = [];
+                    
+                    // 1. Index Sections
+                    const sectionMap = {
+                        'dashboard': { id: 'dashboard', icon: 'dashboard', type: 'Section' },
+                        'study with ai': { id: 'study-with-ai', icon: 'psychology', type: 'Section' },
+                        'quizzes': { id: 'study-with-ai', icon: 'quiz', type: 'Section' },
+                        'syllabus': { id: 'syllabus', icon: 'menu_book', type: 'Section' },
+                        'previous papers': { id: 'academic-resources', icon: 'description', type: 'Section' },
+                        'departments': { id: 'departments', icon: 'apartment', type: 'Section' },
+                        'daily notes': { id: 'notes', icon: 'edit_note', type: 'Section' },
+                        'practice coding': { id: 'practice-coding', icon: 'code', type: 'Section' }
+                    };
+                    Object.entries(sectionMap).forEach(([name, info]) => {
+                        searchIndex.push({ name, ...info });
+                    });
 
-                        let foundMatch = false;
+                    // 2. Index Quiz Data
+                    if (typeof quizData !== 'undefined') {
+                        Object.keys(quizData).forEach(key => {
+                            const readableName = key.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                            const semMatch = key.match(/\d+/);
+                            searchIndex.push({
+                                name: readableName,
+                                id: 'study-with-ai',
+                                icon: 'quiz',
+                                type: 'Quiz',
+                                sem: semMatch ? semMatch[0] : '1'
+                            });
+                        });
+                    }
 
-                        // Check direct keyword match
-                        for (const [key, sectionId] of Object.entries(sectionMap)) {
-                            if (term.includes(key) || key.includes(term)) {
-                                window.location.hash = '#' + sectionId;
-                                foundMatch = true;
-                                globalSearch.value = ''; // clear input after successful navigation
-                                break;
+                    // 3. Index Syllabus (Branches)
+                    const branches = ['CSE', 'CSM', 'CSD', 'IT', 'ECE', 'EEE', 'CIVIL'];
+                    branches.forEach(b => {
+                        searchIndex.push({
+                            name: `${b} Syllabus`,
+                            id: 'syllabus',
+                            icon: 'menu_book',
+                            type: 'Syllabus',
+                            branch: b
+                        });
+                    });
+
+                    // 4. Index Personal Notes
+                    if (Array.isArray(notes)) {
+                        notes.forEach(note => {
+                            searchIndex.push({
+                                name: note.title || 'Untitled Note',
+                                id: 'notes',
+                                icon: 'edit_note',
+                                type: 'Note',
+                                noteId: note.id
+                            });
+                        });
+                    }
+
+                    // 5. Index PDF Resources from all pages
+                    const resourceElements = document.querySelectorAll('.content-section p.font-bold, .content-section h4.font-bold');
+                    resourceElements.forEach(el => {
+                        const name = el.textContent.trim();
+                        if (name && !searchIndex.some(idx => idx.name === name)) {
+                            const section = el.closest('section');
+                            searchIndex.push({
+                                name: name,
+                                id: section ? section.id : 'dashboard',
+                                icon: 'description',
+                                type: 'Resource'
+                            });
+                        }
+                    });
+
+                    // Filter results
+                    const filtered = searchIndex.filter(item => 
+                        item.name.toLowerCase().includes(term) || 
+                        item.type.toLowerCase().includes(term)
+                    ).slice(0, 8); // Limit to top 8 results
+
+                    if (filtered.length > 0) {
+                        searchError.classList.add('hidden');
+                        resultsContainer.classList.remove('hidden');
+                        resultsContainer.innerHTML = filtered.map(item => {
+                            let clickAction = `window.location.hash = '#${item.id}';`;
+                            if (item.type === 'Quiz') {
+                                clickAction = `window.location.hash = '#study-with-ai'; setTimeout(() => { if (typeof selectAISemester === 'function') selectAISemester('${item.sem}'); }, 100);`;
+                            } else if (item.type === 'Syllabus') {
+                                clickAction = `window.location.hash = '#syllabus'; if (typeof selectBranch === 'function') selectBranch('${item.branch}');`;
+                            } else if (item.type === 'Note') {
+                                clickAction = `window.location.hash = '#notes'; if (typeof switchNote === 'function') switchNote(${item.noteId});`;
                             }
-                        }
 
-                        // Check section content match if no keyword match
-                        if (!foundMatch) {
-                            const sections = ['dashboard', 'study-with-ai', 'departments', 'syllabus', 'academic-resources'];
-                            for (const id of sections) {
-                                const section = document.getElementById(id);
-                                if (section && section.textContent.toLowerCase().includes(term)) {
-                                    window.location.hash = '#' + id;
-                                    foundMatch = true;
-                                    globalSearch.value = '';
-                                    break;
-                                }
-                            }
-                        }
-                        // Show error if nothing found
-                        if (!foundMatch) {
-                            searchError.classList.remove('hidden');
-                            errorTimeout = setTimeout(() => {
-                                searchError.classList.add('hidden');
-                            }, 3000);
-                        }
+                            return `
+                                <div class="search-item p-4 hover:bg-blue-50 dark:hover:bg-primary/10 border-b border-blue-50 dark:border-blue-900/10 last:border-0 cursor-pointer transition-all flex items-center justify-between group" 
+                                     onclick="${clickAction}">
+                                    <div class="flex items-center gap-4">
+                                        <div class="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                                            <span class="material-symbols-outlined text-xl">${item.icon}</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-800 dark:text-slate-200">${item.name.replace(new RegExp(term, 'gi'), match => `<span class="bg-primary/20 text-primary rounded-sm px-0.5">${match}</span>`)}</p>
+                                            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-0.5">${item.type}</p>
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-all text-sm opacity-0 group-hover:opacity-100 group-hover:translate-x-1">arrow_forward</span>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        resultsContainer.classList.add('hidden');
+                        searchError.classList.remove('hidden');
+                    }
+                });
+
+                // Hide results on click outside
+                document.addEventListener('click', (e) => {
+                    if (!globalSearch.contains(e.target) && !document.getElementById('search-results').contains(e.target)) {
+                        document.getElementById('search-results').classList.add('hidden');
                     }
                 });
             }
@@ -1505,66 +1628,79 @@
 
         async function saveToStorage() {
             localStorage.setItem('btech_box_notes_v2', JSON.stringify(notes));
-            await syncDataWithBackend();
+            await syncUserProfileWithBackend();
         }
 
-        async function syncDataWithBackend() {
+        async function syncUserProfileWithBackend() {
             const loggedInUser = localStorage.getItem('btech-logged-in-user');
             if (!loggedInUser) return;
 
             try {
-                // Fetch current profile to ensure we don't overwrite with old data
+                // Fetch current profile to preserve fields we might not have in local state (like age, roll, etc.)
                 const response = await fetch(`${AI_BASE_URL}/load_user/${encodeURIComponent(loggedInUser)}`);
+                let profile = {};
                 if (response.ok) {
-                    const profile = await response.json();
-                    profile.notes = notes;
-                    profile.theme = localStorage.getItem('btech-theme') || 'light';
-                    
-                    await fetch(`${AI_BASE_URL}/save_user`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(profile)
-                    });
-                    console.log("[Sync] Data successfully synced to backend.");
+                    profile = await response.json();
+                } else {
+                    // Fallback for new users or if fetch fails
+                    const savedProfile = localStorage.getItem('btech-profile');
+                    if (savedProfile) profile = JSON.parse(savedProfile);
                 }
+
+                // Update with latest local data
+                profile.fullname = loggedInUser;
+                profile.notes = notes;
+                const perfKey = `tkr_quiz_performance_${loggedInUser.replace(/\s+/g, '_').toLowerCase()}`;
+                const localPerf = localStorage.getItem(perfKey);
+                if (localPerf) profile.performance = JSON.parse(localPerf);
+                profile.theme = localStorage.getItem('btech-theme') || 'light';
+                
+                await fetch(`${AI_BASE_URL}/save_user`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profile)
+                });
+                console.log("[Sync] User profile unified and synced to backend.");
             } catch (e) {
-                console.error("[Sync] Failed to sync with backend:", e);
+                console.error("[Sync] Unified sync failed:", e);
             }
         }
 
-        async function loadNotesFromProfile(profile) {
-            if (profile && profile.notes && profile.notes.length > 0) {
-                // Backend is Source of Truth - use its notes
-                console.log("[Sync] Loading notes from backend profile.");
-                notes = profile.notes;
-                localStorage.setItem('btech_box_notes_v2', JSON.stringify(notes));
-                renderNotesList();
-                if (notes.length > 0) {
-                    const savedActiveId = localStorage.getItem('btech_box_active_note_id');
-                    const activeNote = notes.find(n => n.id == savedActiveId) || notes[0];
-                    activeNoteId = activeNote.id;
-                    displayNote(activeNote);
-                }
-            } else {
-                // Backend has no notes - if we have local notes, push them to backend!
-                if (notes.length > 0) {
-                    console.log("[Sync] Backend empty, pushing local notes to server...");
-                    await syncDataWithBackend();
-                } else {
-                    // Both empty - create default
-                    console.log("[Sync] No notes found anywhere, creating default.");
-                    createNewNote("My First Note", "Welcome to your personal notes!");
-                }
-            }
+        async function loadUserProfileFromBackend(profile) {
+            if (!profile) return;
+            console.log(`[Sync] Loading full profile for: ${profile.fullname}`);
             
-            // Also sync theme from profile if it exists
-            if (profile && profile.theme) {
-                console.log(`[Sync] Setting theme from profile: ${profile.theme}`);
-                // Use a flag to prevent infinite loops if setTheme calls sync
+            // 1. Sync Notes
+            if (profile.notes && profile.notes.length > 0) {
+                notes = profile.notes;
+            }
+            localStorage.setItem('btech_box_notes_v2', JSON.stringify(notes));
+            if (typeof renderNotesList === "function") renderNotesList();
+            
+            // 2. Sync Theme
+            if (profile.theme) {
                 if (window.currentTheme !== profile.theme) {
                     setTheme(profile.theme);
                 }
             }
+
+            // 3. Sync Performance
+            if (profile.performance) {
+                const perfKey = `tkr_quiz_performance_${profile.fullname.replace(/\s+/g, '_').toLowerCase()}`;
+                localStorage.setItem(perfKey, JSON.stringify(profile.performance));
+                // If the dashboard script is loaded, update its internal state
+                if (typeof window.loadPerformance === "function") {
+                    window.loadPerformance(profile);
+                }
+            }
+
+            // 4. Update UI
+            if (typeof window.updateUIForUser === "function") {
+                window.updateUIForUser(profile);
+            }
+
+            // 5. Redirect to Dashboard (User Request)
+            window.location.hash = '#dashboard';
         }
 
         function clearNotes() {
@@ -2071,14 +2207,16 @@
 
 <script>
     // Define AI_BASE_URL globally for all scripts to use
-    const AI_BASE_URL = window.location.protocol === 'file:' ? 'http://localhost:8001' : '';
+    // If protocol is 'file:', we MUST target localhost:8001
+    // If protocol is 'http:', we can use empty string for relative paths (safer for proxying)
+
 
     document.addEventListener("DOMContentLoaded", () => {
         updateAIQuizCards();
         const DEFAULT_PERFORMANCE = {
-            moderate: { attempts: 0, bestScore: 0, unlocked: true },
-            high: { attempts: 0, bestScore: 0, unlocked: true },
-            advance: { attempts: 0, bestScore: 0, unlocked: true }
+            moderate: { attempts: 0, bestScore: 0, totalQuestions: 10, unlocked: true },
+            high: { attempts: 0, bestScore: 0, totalQuestions: 15, unlocked: true },
+            advance: { attempts: 0, bestScore: 0, totalQuestions: 20, unlocked: true }
         };
         let performance = { ...DEFAULT_PERFORMANCE };
 
@@ -2138,28 +2276,12 @@
         }
 
         async function savePerformance() {
+            const user = localStorage.getItem('btech-logged-in-user');
             const key = getPerformanceKey();
             localStorage.setItem(key, JSON.stringify(performance));
             
-            const user = localStorage.getItem('btech-logged-in-user');
             if (user) {
-                try {
-                    // Fetch existing profile to preserve other fields
-                    const response = await fetch(`${AI_BASE_URL}/load_user/${encodeURIComponent(user)}`);
-                    if (response.ok) {
-                        const profile = await response.json();
-                        // Only update if we have meaningful performance data
-                        profile.performance = performance;
-                        await fetch(`${AI_BASE_URL}/save_user`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(profile)
-                        });
-                        console.log("Performance synced to backend.");
-                    }
-                } catch (e) {
-                    console.error("Error syncing performance to backend:", e);
-                }
+                await syncUserProfileWithBackend();
             }
             updateDashboard();
         }
@@ -2202,8 +2324,13 @@
                 }
                 grid.innerHTML = activeModules.map(([key, data]) => {
                     const conf = configs[key] || getSubjectConfig(key);
-                    // Use the stored totalQuestions for accurate bar width; fallback to bestScore itself
-                    const total = data.totalQuestions || data.bestScore || 1;
+                    // Use quizData length if available, otherwise fallback to stored total or default to 10
+                    let total = 10;
+                    if (typeof quizData !== 'undefined' && quizData[key]) {
+                        total = quizData[key].length;
+                    } else {
+                        total = data.totalQuestions || 10;
+                    }
                     const perc = Math.min(100, Math.round((data.bestScore / total) * 100));
                     return `
                         <div class="glass-card p-6 rounded-[2rem] border-white/60 shadow-sm flex flex-col items-start hover:shadow-xl transition-all duration-300">
@@ -2217,10 +2344,10 @@
                             <div class="w-full mt-auto">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-[10px] font-bold text-slate-400 uppercase">Best Score</span>
-                                    <span class="text-sm font-black text-primary">${data.bestScore}</span>
+                                    <span class="text-sm font-black text-primary">${data.bestScore} <span class="text-[10px] text-slate-400">/ ${total}</span></span>
                                 </div>
                                 <div class="h-1.5 w-full bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
-                                    <div class="h-full bg-primary rounded-full" style="width: ${perc}%"></div>
+                                    <div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: ${perc}%"></div>
                                 </div>
                             </div>
                         </div>
@@ -2524,56 +2651,120 @@
     <!-- Profile Modal -->
     <div id="profile-modal" class="fixed inset-0 z-[2000] hidden items-center justify-center">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" id="profile-backdrop"></div>
-        <div class="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl p-8 transform transition-all animate-in zoom-in-95 duration-200 border border-blue-100 dark:border-slate-700">
-            <button id="close-profile" class="absolute right-6 top-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+        <div class="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-[3rem] shadow-2xl p-0 overflow-hidden transform transition-all animate-in zoom-in-95 duration-300 border border-blue-100 dark:border-slate-700">
+            <button id="close-profile" class="absolute right-8 top-8 z-10 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                 <span class="material-symbols-outlined">close</span>
             </button>
-            <div class="size-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6">
-                <span class="material-symbols-outlined text-2xl">person_edit</span>
-            </div>
-            <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-2">Your Profile</h3>
-            <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6">Update your academic information.</p>
             
-            <form id="profile-form" class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="col-span-2">
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Full Name</label>
-                        <input type="text" id="profile-fullname" required class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm transition-all text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary" placeholder="Enter full name">
+            <div class="flex flex-col md:flex-row h-full">
+                <!-- Left: Photo Upload Area -->
+                <div class="md:w-1/3 bg-slate-50 dark:bg-slate-900/50 p-10 flex flex-col items-center justify-center border-r border-blue-50 dark:border-slate-700/50">
+                    <div class="relative group cursor-pointer" onclick="document.getElementById('photo-input').click()">
+                        <div class="size-40 rounded-full bg-slate-200 dark:bg-slate-800 p-1 ring-4 ring-primary/20 group-hover:ring-primary/40 transition-all overflow-hidden">
+                            <img id="profile-photo-preview" src="https://img.freepik.com/premium-vector/account-avatar-profile-icon-simple-editable-vector-graphics_922357-21587.jpg" alt="Profile" class="w-full h-full object-cover rounded-full">
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="material-symbols-outlined text-white text-3xl">photo_camera</span>
+                        </div>
+                        <input type="file" id="photo-input" class="hidden" accept="image/*">
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Age</label>
-                        <input type="number" id="profile-age" required class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm transition-all text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary" placeholder="Age">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Date of Birth</label>
-                        <input type="date" id="profile-dob" required class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm transition-all text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Year</label>
-                        <select id="profile-year" required class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm transition-all text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary">
-                            <option value="1">1st Year</option>
-                            <option value="2">2nd Year</option>
-                            <option value="3">3rd Year</option>
-                            <option value="4">4th Year</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Semester</label>
-                        <select id="profile-semester" required class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm transition-all text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary">
-                            <option value="1">Semester 1</option>
-                            <option value="2">Semester 2</option>
-                        </select>
-                    </div>
-                    <div class="col-span-2">
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Roll Number</label>
-                        <input type="text" id="profile-roll" required class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm transition-all text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary" placeholder="Enter roll number">
-                    </div>
+                    <h4 class="mt-6 font-black text-slate-900 dark:text-white text-lg">Student Photo</h4>
+                    <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1 text-center">Click image to upload</p>
                 </div>
-                
-                <button type="submit" class="w-full py-3 mt-6 bg-primary text-white font-bold rounded-xl hover:shadow-lg hover:shadow-primary/30 transition-all active:scale-95 flex items-center justify-center gap-2">
-                    Save Profile <span class="material-symbols-outlined text-[18px]">save</span>
-                </button>
-            </form>
+
+                <!-- Right: Personal Details Form -->
+                <div class="md:w-2/3 p-10">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                            <span class="material-symbols-outlined">person_edit</span>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-black text-slate-900 dark:text-white">Personal Details</h3>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Academic Identity Portfolio</p>
+                        </div>
+                    </div>
+                    
+                    <form id="profile-form" class="space-y-6">
+                        <div class="grid grid-cols-2 gap-5">
+                            <div class="col-span-2">
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Full Name</label>
+                                <input type="text" id="profile-fullname" required class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm font-medium transition-all text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary" placeholder="Enter full name">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Age</label>
+                                <input type="number" id="profile-age" required class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm font-medium transition-all text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary" placeholder="Age">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Roll Number</label>
+                                <input type="text" id="profile-roll" required class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm font-medium transition-all text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary" placeholder="Roll Number">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Current Year</label>
+                                <select id="profile-year" required class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm font-medium transition-all text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                                    <option value="1">1st Year</option>
+                                    <option value="2">2nd Year</option>
+                                    <option value="3">3rd Year</option>
+                                    <option value="4">4th Year</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Semester</label>
+                                <select id="profile-semester" required class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm font-medium transition-all text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                                    <option value="1">Sem 1</option>
+                                    <option value="2">Sem 2</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Resume Section -->
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Professional Resume</label>
+                            
+                            <!-- State: No File -->
+                            <div id="resume-empty-state" class="block">
+                                <button type="button" onclick="document.getElementById('resume-input').click()" class="w-full px-6 py-4 bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl text-xs font-bold text-slate-500 hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-3 group">
+                                    <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">upload_file</span>
+                                    <span>Upload Academic Resume (PDF)</span>
+                                </button>
+                            </div>
+
+                            <!-- State: File Uploaded -->
+                            <div id="resume-file-state" class="hidden items-center gap-4 py-3 px-5 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-2xl border border-emerald-100 dark:border-emerald-500/20">
+                                <div class="size-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                                    <span class="material-symbols-outlined font-bold">description</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-black text-slate-900 dark:text-white truncate" id="resume-filename">Academic_Resume.pdf</p>
+                                    <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-widest flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[12px]">check_circle</span> Verified
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <a id="resume-view-link" href="#" target="_blank" class="size-9 rounded-xl flex items-center justify-center text-emerald-600 hover:bg-emerald-500/10 transition-all" title="View Resume">
+                                        <span class="material-symbols-outlined">open_in_new</span>
+                                    </a>
+                                    <div class="w-px h-4 bg-emerald-200 dark:bg-emerald-500/20 mx-1"></div>
+                                    <button type="button" onclick="document.getElementById('resume-input').click()" class="size-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-primary transition-all" title="Change File">
+                                        <span class="material-symbols-outlined text-[20px]">sync</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <input type="file" id="resume-input" class="hidden" accept=".pdf">
+                        </div>
+                        
+                        <div class="flex gap-4 pt-4">
+                            <button type="submit" class="flex-1 py-4 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/30 hover:bg-primary-dark transition-all active:scale-95 flex items-center justify-center gap-3 text-sm">
+                                Complete Profile <span class="material-symbols-outlined">verified</span>
+                            </button>
+                        </div>
+                        
+                        <input type="hidden" id="profile-photo_url">
+                        <input type="hidden" id="profile-resume_url">
+                        <input type="hidden" id="profile-dob" value=""> <!-- Hidden as user didn't ask but backend expects it -->
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2592,8 +2783,8 @@
         closeThemeDropdown();
         
         // Sync theme to backend if possible
-        if (typeof syncDataWithBackend === "function") {
-            syncDataWithBackend();
+        if (typeof syncUserProfileWithBackend === "function") {
+            syncUserProfileWithBackend();
         }
     }
 
@@ -2669,7 +2860,12 @@
                     userProfile.classList.remove('hidden');
                     userProfile.classList.add('flex');
                     const nameLabel = userProfile.querySelector('.text-xs.font-bold');
-                    if (nameLabel) nameLabel.textContent = profile.fullname;
+                    if (nameLabel) nameLabel.textContent = profile.fullname || "Student";
+                    
+                    const img = userProfile.querySelector('img');
+                    if (img && profile.photo_url) {
+                        img.src = profile.photo_url.startsWith('/') ? `${AI_BASE_URL}${profile.photo_url}` : profile.photo_url;
+                    }
                 }
                 
                 // Hide the login gate
@@ -2731,10 +2927,7 @@
                     const profile = await fetchUserProfile(fullname);
                     if (profile && profile.roll.toUpperCase() === roll.toUpperCase()) {
                         localStorage.setItem(LOGGED_IN_USER_KEY, fullname);
-                        updateUIForUser(profile);
-                        if (typeof loadPerformance === "function") loadPerformance(profile);
-                        if (typeof loadNotesFromProfile === "function") await loadNotesFromProfile(profile);
-                        if (profile.theme && typeof setTheme === "function") setTheme(profile.theme);
+                        await loadUserProfileFromBackend(profile);
                     } else {
                         alert("Authentication Failed. Check your credentials or join us first.");
                     }
@@ -2767,10 +2960,7 @@
                 const profile = await fetchUserProfile(fullname);
                 if (profile && profile.roll.toUpperCase() === roll.toUpperCase()) {
                     localStorage.setItem(LOGGED_IN_USER_KEY, fullname);
-                    updateUIForUser(profile);
-                    if (typeof loadPerformance === "function") loadPerformance(profile);
-                    if (typeof loadNotesFromProfile === "function") await loadNotesFromProfile(profile);
-                    if (profile.theme && typeof setTheme === "function") setTheme(profile.theme);
+                    await loadUserProfileFromBackend(profile);
                     closeLogin();
                 } else {
                     alert("Invalid Full Name or Roll Number. Please ensure your profile is created FIRST via the Profile menu.");
@@ -2814,13 +3004,24 @@
         const profileBackdrop = document.getElementById('profile-backdrop');
         const closeProfileBtn = document.getElementById('close-profile');
         const profileForm = document.getElementById('profile-form');
-        const fields = ['fullname', 'age', 'dob', 'year', 'semester', 'roll'];
+        const fields = ['fullname', 'age', 'dob', 'year', 'semester', 'roll', 'photo_url', 'resume_url'];
 
         function clearProfileForm() {
             fields.forEach(f => {
                 const el = document.getElementById(`profile-${f}`);
                 if (el) el.value = '';
             });
+            // Reset photo preview to default
+            const preview = document.getElementById('profile-photo-preview');
+            if (preview) preview.src = 'https://img.freepik.com/premium-vector/account-avatar-profile-icon-simple-editable-vector-graphics_922357-21587.jpg';
+            
+            // Reset resume UI
+            const resumeEmpty = document.getElementById('resume-empty-state');
+            const resumeFile = document.getElementById('resume-file-state');
+            if (resumeEmpty) resumeEmpty.classList.remove('hidden');
+            if (resumeFile) resumeFile.classList.add('hidden');
+            const viewLink = document.getElementById('resume-view-link');
+            if (viewLink) viewLink.href = '#';
         }
         window.clearProfileForm = clearProfileForm; // Optional: expose just in case
 
@@ -2833,7 +3034,34 @@
                     if (profileData) {
                         fields.forEach(f => {
                             const el = document.getElementById(`profile-${f}`);
-                            if (el && profileData[f]) el.value = profileData[f];
+                            if (el && profileData[f]) {
+                                el.value = profileData[f];
+                                if (f === 'photo_url') {
+                                    const rawUrl = profileData[f];
+                                    const fullUrl = (rawUrl && rawUrl.startsWith('/')) ? `${AI_BASE_URL}${rawUrl}` : (rawUrl || 'https://img.freepik.com/premium-vector/account-avatar-profile-icon-simple-editable-vector-graphics_922357-21587.jpg');
+                                    document.getElementById('profile-photo-preview').src = fullUrl;
+                                    // Update header icon too
+                                    const headerPhotos = document.querySelectorAll('#user-profile img, .size-10.rounded-full.bg-slate-200 img'); 
+                                    headerPhotos.forEach(img => img.src = fullUrl);
+                                }
+                                if (f === 'resume_url' && profileData[f]) {
+                                    const resumeEmpty = document.getElementById('resume-empty-state');
+                                    const resumeFile = document.getElementById('resume-file-state');
+                                    const viewLink = document.getElementById('resume-view-link');
+                                    const fileName = document.getElementById('resume-filename');
+                                    
+                                    if (resumeEmpty) resumeEmpty.classList.add('hidden');
+                                    if (resumeFile) resumeFile.classList.remove('hidden');
+                                    if (resumeFile) resumeFile.classList.add('flex');
+                                    
+                                    const fullUrl = profileData[f].startsWith('/') ? `${AI_BASE_URL}${profileData[f]}` : profileData[f];
+                                    if (viewLink) viewLink.href = fullUrl;
+                                    if (fileName) {
+                                        const name = profileData[f].split('/').pop();
+                                        fileName.textContent = name || 'Resume.pdf';
+                                    }
+                                }
+                            }
                         });
                         return;
                     }
@@ -2875,10 +3103,21 @@
                 profileModal.classList.remove('hidden');
                 profileModal.classList.add('flex');
             });
+
+            // Added: Click on header profile photo to open modal
+            userProfile.addEventListener('click', (e) => {
+                // Don't open if clicking logout button (which is inside userProfile dropdown)
+                if (e.target.closest('#logout-btn')) return;
+                loadProfile();
+                profileModal.classList.remove('hidden');
+                profileModal.classList.add('flex');
+            });
+
             const closeProfile = () => {
                 profileModal.classList.add('hidden');
                 profileModal.classList.remove('flex');
             };
+
             closeProfileBtn.addEventListener('click', closeProfile);
             profileBackdrop.addEventListener('click', closeProfile);
             profileForm.addEventListener('submit', async (e) => {
@@ -2895,24 +3134,276 @@
 
                 try {
                     await saveProfile(data);
-                    closeProfile();
                     
                     // Auto-login after save
                     localStorage.setItem(LOGGED_IN_USER_KEY, data.fullname);
                     
-                    // Sync UI and Dashboard
-                    if (typeof updateUIForUser === "function") updateUIForUser(data);
-                    if (typeof loadPerformance === "function") loadPerformance(data);
+                    // Perform a full unified sync and UI update
+                    if (typeof syncUserProfileWithBackend === "function") await syncUserProfileWithBackend();
+                    if (typeof loadUserProfileFromBackend === "function") await loadUserProfileFromBackend(data);
                     
-                    alert("Profile Created & Logged In Successfully!");
+                    closeProfile();
+                    alert("Profile Saved Successfully!");
                 } catch (err) {
                     alert("Error saving profile. Please try again.");
                 } finally {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Save Profile <span class="material-symbols-outlined text-[18px]">save</span>';
+                    submitBtn.innerHTML = 'Complete Profile <span class="material-symbols-outlined">verified</span>';
                 }
             });
         }
+
+        // --- File Upload Logic ---
+        async function uploadFile(file, fullname) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`${AI_BASE_URL}/upload_file?fullname=${encodeURIComponent(fullname)}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.url;
+                }
+            } catch (e) {
+                console.error("Upload error:", e);
+            }
+            return null;
+        }
+
+        const photoInput = document.getElementById('photo-input');
+        if (photoInput) {
+            photoInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                // Show local preview immediately
+                const reader = new FileReader();
+                reader.onload = (re) => {
+                    document.getElementById('profile-photo-preview').src = re.target.result;
+                };
+                reader.readAsDataURL(file);
+
+                const fullnameInput = document.getElementById('profile-fullname');
+                const fullname = fullnameInput ? fullnameInput.value.trim() : null;
+                if (fullname) {
+                    const url = await uploadFile(file, fullname);
+                    if (url) {
+                        const fullUrl = url.startsWith('/') ? `${AI_BASE_URL}${url}` : url;
+                        document.getElementById('profile-photo_url').value = url;
+                        document.getElementById('profile-photo-preview').src = fullUrl;
+                        // Also update header icon
+                        const headerPhotos = document.querySelectorAll('#user-profile img, .size-10.rounded-full.bg-slate-200 img');
+                        headerPhotos.forEach(img => img.src = fullUrl);
+                    }
+                }
+            });
+        }
+
+        const resumeInput = document.getElementById('resume-input');
+        if (resumeInput) {
+            resumeInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const fullnameInput = document.getElementById('profile-fullname');
+                const fullname = fullnameInput ? fullnameInput.value.trim() : null;
+                if (fullname) {
+                    const url = await uploadFile(file, fullname);
+                    if (url) {
+                        const fullUrl = url.startsWith('/') ? `${AI_BASE_URL}${url}` : url;
+                        document.getElementById('profile-resume_url').value = url;
+                        
+                        const resumeEmpty = document.getElementById('resume-empty-state');
+                        const resumeFile = document.getElementById('resume-file-state');
+                        const viewLink = document.getElementById('resume-view-link');
+                        const fileName = document.getElementById('resume-filename');
+                        
+                        if (resumeEmpty) resumeEmpty.classList.add('hidden');
+                        if (resumeFile) resumeFile.classList.remove('hidden');
+                        if (resumeFile) resumeFile.classList.add('flex');
+                        
+                        if (viewLink) viewLink.href = fullUrl;
+                        if (fileName) fileName.textContent = file.name;
+                    }
+                }
+            });
+        }
+
+        // --- Practice Coding Logic ---
+        let monacoEditor = null;
+        let monacoLoading = false;
+        const DEFAULT_CODE = {
+            python: "def main():\n    print('Hello from Python!')\n\nif __name__ == '__main__':\n    main()",
+            c: "#include <stdio.h>\n\nint main() {\n    printf(\"Hello from C!\\n\");\n    return 0;\n}",
+            java: "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello from Java!\");\n    }\n}"
+        };
+
+        function initMonaco() {
+            if (monacoEditor || monacoLoading) return;
+            monacoLoading = true;
+            console.log("Initializing Monaco...");
+            
+            const container = document.getElementById('monaco-editor-container');
+            if (container) {
+                container.innerHTML = '<div class="absolute inset-0 flex flex-col items-center justify-center space-y-4 text-slate-400 bg-slate-900/10"><span class="animate-spin material-symbols-outlined text-4xl">sync</span><p class="text-xs font-black uppercase tracking-widest animate-pulse">Initializing Coding Engine...</p></div>';
+            }
+            
+            require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
+            require(['vs/editor/editor.main'], function() {
+                if (!container) return;
+                container.innerHTML = ''; // Clear loading
+                
+                monacoEditor = monaco.editor.create(container, {
+                    value: DEFAULT_CODE.python,
+                    language: 'python',
+                    theme: 'vs-dark',
+                    automaticLayout: true,
+                    fontSize: 14,
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    lineNumbers: 'on',
+                    roundedSelection: true,
+                    padding: { top: 20 }
+                });
+                console.log("Monaco Initialized!");
+                monacoLoading = false;
+            }, function(err) {
+                console.error("Monaco load error:", err);
+                if (container) {
+                    container.innerHTML = `<div class="p-8 text-center"><p class="text-red-500 font-black">CDN Load Error</p><p class="text-[10px] text-slate-500 mt-1">Failed to connect to Monaco Editor service. Please check your internet or try refreshing.</p></div>`;
+                }
+                monacoLoading = false;
+            });
+        }
+
+        const codingLangSelect = document.getElementById('coding-language');
+        codingLangSelect?.addEventListener('change', (e) => {
+            const lang = e.target.value;
+            const badge = document.getElementById('editor-lang-badge');
+            if (badge) badge.textContent = e.target.options[e.target.selectedIndex].text;
+            
+            if (monacoEditor) {
+                const model = monacoEditor.getModel();
+                monaco.editor.setModelLanguage(model, lang);
+                monacoEditor.setValue(DEFAULT_CODE[lang] || "");
+            }
+        });
+
+        document.getElementById('run-code-btn')?.addEventListener('click', async () => {
+            if (!monacoEditor) {
+                alert("Coding environment is still loading. Please wait a moment or refresh the page.");
+                return;
+            }
+            const code = monacoEditor.getValue();
+            const lang = codingLangSelect.value;
+            console.log(`Running ${lang} code:`, code.substring(0, 50));
+            const outputEl = document.getElementById('coding-output');
+            
+            outputEl.innerHTML = '<span class="text-primary animate-pulse">Running...</span>';
+            
+            try {
+                const response = await fetch(`${AI_BASE_URL}/run_code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ language: lang, code: code })
+                });
+                if (!response.ok) {
+                    throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+                }
+                const result = await response.json();
+                outputEl.textContent = result.output || "No output returned.";
+                outputEl.scrollTop = outputEl.scrollHeight;
+            } catch (err) {
+                console.error("Execution error:", err);
+                outputEl.innerHTML = `<div class="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+                    <p class="text-red-500 font-black flex items-center gap-2">
+                        <span class="material-symbols-outlined">error</span> Execution Service Error
+                    </p>
+                    <p class="text-xs text-red-600/70 mt-1">${err.message}</p>
+                    <p class="text-[10px] text-slate-500 mt-2 font-mono">Endpoint: ${AI_BASE_URL}/run_code</p>
+                </div>`;
+            }
+        });
+
+        document.getElementById('clear-output-btn')?.addEventListener('click', () => {
+            document.getElementById('coding-output').innerHTML = '<span class="text-slate-600 italic">Terminal cleared. Ready.</span>';
+        });
+
+        document.getElementById('save-code-btn')?.addEventListener('click', async () => {
+            const filename = prompt("Enter filename (e.g., solution.py):");
+            if (!filename) return;
+            
+            const user = localStorage.getItem(LOGGED_IN_USER_KEY);
+            if (!user) { alert("Please login to save snippets."); return; }
+            
+            try {
+                await fetch(`${AI_BASE_URL}/save_snippet`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: user,
+                        filename: filename,
+                        code: monacoEditor.getValue(),
+                        language: codingLangSelect.value
+                    })
+                });
+                alert("Snippet saved successfully!");
+            } catch (err) { alert("Error saving snippet."); }
+        });
+
+        document.getElementById('open-code-btn')?.addEventListener('click', async () => {
+            const user = localStorage.getItem(LOGGED_IN_USER_KEY);
+            if (!user) { alert("Please login to view snippets."); return; }
+            
+            try {
+                const response = await fetch(`${AI_BASE_URL}/list_snippets/${encodeURIComponent(user)}`);
+                const snippets = await response.json();
+                
+                if (snippets.length === 0) {
+                    alert("No saved snippets found.");
+                    return;
+                }
+                
+                const filename = prompt(`Available snippets:\n${snippets.join('\n')}\n\nEnter filename to open:`);
+                if (!filename) return;
+                
+                const loadResp = await fetch(`${AI_BASE_URL}/load_snippet/${encodeURIComponent(user)}/${encodeURIComponent(filename)}`);
+                if (loadResp.ok) {
+                    const data = await loadResp.json();
+                    monacoEditor.setValue(data.code);
+                    codingLangSelect.value = data.language;
+                    const badge = document.getElementById('editor-lang-badge');
+                    if (badge) badge.textContent = codingLangSelect.options[codingLangSelect.selectedIndex].text;
+                    monaco.editor.setModelLanguage(monacoEditor.getModel(), data.language);
+                } else {
+                    alert("Failed to load snippet.");
+                }
+            } catch (err) { alert("Error loading snippets."); }
+        });
+
+        // Initialize Monaco when the section becomes active
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.id === 'practice-coding' && mutation.target.classList.contains('active')) {
+                    initMonaco();
+                }
+            });
+        });
+        const practiceSection = document.getElementById('practice-coding');
+        if (practiceSection) {
+            observer.observe(practiceSection, { attributes: true, attributeFilter: ['class'] });
+            // Also check initial state
+            if (practiceSection.classList.contains('active')) {
+                initMonaco();
+            }
+        }
+
+        // Expose functions globally for unified sync in the first script block
+        window.updateUIForUser = updateUIForUser;
+        window.fetchUserProfile = fetchUserProfile;
     });
 
     // ────────────────────────────────────────────────────────────────────────

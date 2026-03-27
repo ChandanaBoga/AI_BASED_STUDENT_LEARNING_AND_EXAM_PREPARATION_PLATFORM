@@ -1,13 +1,17 @@
 import json
 import os
 import asyncio
-from typing import Dict, Any, Optional, AsyncIterator
+from typing import Dict, Any, Optional, AsyncIterator, List
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+import subprocess
+import tempfile
+import shutil
+import sys
 import ollama
 import uvicorn
 import logging
@@ -43,6 +47,14 @@ async def read_combined_app():
     return FileResponse(os.path.join(FRONTEND_DIR, "combined_app.html"))
 
 app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIR, "assets")), name="assets")
+
+# --- User Data & Uploads ---
+DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
+UPLOADS_DIR = os.path.join(DATA_DIR, "uploads")
+if not os.path.exists(UPLOADS_DIR):
+    os.makedirs(UPLOADS_DIR)
+
+app.mount("/data/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
 # --- Proctor Proxy ---
 PROCTOR_BASE_URL = "http://localhost:5050"
@@ -89,6 +101,18 @@ class UserProfile(BaseModel):
     performance: Optional[Dict[str, Any]] = None
     notes: Optional[List[Dict[str, Any]]] = None
     theme: Optional[str] = None
+    photo_url: Optional[str] = None
+    resume_url: Optional[str] = None
+
+class CodeExecuteRequest(BaseModel):
+    language: str
+    code: str
+
+class CodeSaveRequest(BaseModel):
+    username: str
+    filename: str
+    code: str
+    language: str
 
 
 # --- Knowledge Base ---
@@ -294,11 +318,6 @@ async def generate_quiz(request: QuizRequest):
             asyncio.to_thread(
                 ollama.chat,
                 model='llama3.2:3b',
-                messages=[
-                    {'role': 'system', 'content': system_prompt},
-                    {'role': 'user',   'content': prompt}
-                ],
-                options={"temperature": 0.2}   # less random = more JSON-compliant output
             ),
             timeout=180.0
         )
@@ -355,10 +374,156 @@ async def load_user(fullname: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/upload_file")
+async def upload_file(fullname: str, file: UploadFile = File(...)):
+    try:
+        user_upload_dir = os.path.join(UPLOADS_DIR, fullname.replace(' ', '_').lower())
+        if not os.path.exists(user_upload_dir):
+            os.makedirs(user_upload_dir)
+        
+        file_path = os.path.join(user_upload_dir, file.filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        file_url = f"/data/uploads/{fullname.replace(' ', '_').lower()}/{file.filename}"
+        return {"url": file_url}
+    except Exception as e:
+        logger.error(f"[/upload_file] Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "model": "llama3.2:3b"}
 
 
+# --- Practice Coding Backend ---
+SNIPPETS_DIR = os.path.join(DATA_DIR, "snippets")
+if not os.path.exists(SNIPPETS_DIR):
+    os.makedirs(SNIPPETS_DIR)
+
+@app.post("/run_code")
+async def run_code(request: CodeExecuteRequest):
+    lang = request.language.lower()
+    code = request.code
+    
+    with tempfile.TemporaryDirectory() as tmpdir:
+        logger.info(f"Execution request for {lang}. Temp dir: {tmpdir}")
+        logger.info(f"Code snippet (first 100 chars): {code[:100]}")
+        try:
+            if lang == "python":
+                file_path = os.path.join(tmpdir, "solution.py")
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(code)
+                
+                # Use current interpreter to ensure we are in the same environment
+                python_exe = sys.executable
+                logger.info(f"Executing Python code with: {python_exe}")
+                
+                result = subprocess.run(
+                    [python_exe, file_path],
+                    capture_output=True, text=True, timeout=10
+                )
+                output = result.stdout + result.stderr
+                logger.info(f"Execution finished. Return code: {result.returncode}. Output length: {len(output)}")
+                return {"output": output if output else "Program executed with no output."}
+            
+            elif lang == "c":
+                file_path = os.path.join(tmpdir, "solution.c")
+                exec_name = "solution.exe" if os.name == 'nt' else "solution"
+                exec_path = os.path.join(tmpdir, exec_name)
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(code)
+                # Compile
+                compile_res = subprocess.run(
+                    ["gcc", file_path, "-o", exec_path],
+                    capture_output=True, text=True, timeout=10
+                )
+                if compile_res.returncode != 0:
+                    return {"output": "Compilation Error:\n" + compile_res.stderr}
+                # Run
+                run_res = subprocess.run(
+                    [exec_path],
+                    capture_output=True, text=True, timeout=10
+                )
+                return {"output": run_res.stdout + run_res.stderr}
+            
+            elif lang == "java":
+                # Java requires class name to match file name. We'll extract or enforce.
+                # Simplest: assume class Main
+                file_path = os.path.join(tmpdir, "Main.java")
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(code)
+                # Compile
+                compile_res = subprocess.run(
+                    ["javac", file_path],
+                    capture_output=True, text=True, timeout=10
+                )
+                if compile_res.returncode != 0:
+                    return {"output": "Compilation Error:\n" + compile_res.stderr}
+                # Run
+                run_res = subprocess.run(
+                    ["java", "-cp", tmpdir, "Main"],
+                    capture_output=True, text=True, timeout=10
+                )
+                return {"output": run_res.stdout + run_res.stderr}
+            
+            else:
+                return {"output": f"Language {lang} not supported for execution."}
+        
+        except subprocess.TimeoutExpired:
+            return {"output": "Error: Execution Timed Out (10s max)"}
+        except Exception as e:
+            logger.error(f"Code execution error: {e}")
+            return {"output": f"System Error: {str(e)}"}
+
+@app.post("/save_snippet")
+async def save_snippet(request: CodeSaveRequest):
+    user_dir = os.path.join(SNIPPETS_DIR, request.username.replace(" ", "_").lower())
+    if not os.path.exists(user_dir):
+        os.makedirs(user_dir)
+    
+    file_path = os.path.join(user_dir, request.filename)
+    # Ensure filename ends with correct extension if not present
+    ext_map = {"python": ".py", "c": ".c", "java": ".java"}
+    ext = ext_map.get(request.language.lower(), ".txt")
+    if not file_path.endswith(ext):
+        file_path += ext
+        
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(request.code)
+    
+    return {"status": "success", "path": file_path}
+
+@app.get("/list_snippets/{username}")
+async def list_snippets(username: str):
+    user_dir = os.path.join(SNIPPETS_DIR, username.replace(" ", "_").lower())
+    if not os.path.exists(user_dir):
+        return []
+    
+    snippets = []
+    for f in os.listdir(user_dir):
+        if os.path.isfile(os.path.join(user_dir, f)):
+            snippets.append(f)
+    return snippets
+
+@app.get("/load_snippet/{username}/{filename}")
+async def load_snippet(username: str, filename: str):
+    user_dir = os.path.join(SNIPPETS_DIR, username.replace(" ", "_").lower())
+    file_path = os.path.join(user_dir, filename)
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Snippet not found")
+        
+    with open(file_path, "r", encoding="utf-8") as f:
+        code = f.read()
+    
+    # Determine language from extension
+    ext = os.path.splitext(filename)[1]
+    lang_map = {".py": "python", ".c": "c", ".java": "java"}
+    lang = lang_map.get(ext, "python")
+    
+    return {"code": code, "language": lang}
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8001, reload=False)
+    uvicorn.run(app, host="0.0.0.0", port=8001)
