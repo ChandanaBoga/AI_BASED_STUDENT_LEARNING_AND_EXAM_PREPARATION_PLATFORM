@@ -6,4 +6,6 @@ __pycache__/
 *.pyc
 pyright_output.txt
 crash_debug.log
-data/
+# Keep data/ knowledge base but exclude temp/user data if it's large
+data/users/
+data/database/
