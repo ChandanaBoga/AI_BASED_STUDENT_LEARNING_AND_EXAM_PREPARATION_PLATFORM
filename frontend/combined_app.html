@@ -206,6 +206,10 @@
                     <span class="material-symbols-outlined">apartment</span>
                     <span>Departments</span>
                 </a>
+                <a class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all" href="#notes" data-page="notes">
+                    <span class="material-symbols-outlined">edit_note</span>
+                    <span>Notes</span>
+                </a>
             </nav>
             <div class="px-4 pb-8">
                 <a class="flex items-center gap-4 px-5 py-3.5 rounded-2xl bg-[#001f3f] text-white font-bold transition-all shadow-lg hover:opacity-90 active:scale-95" href="https://tkrcet.ac.in/" target="_blank">
@@ -820,7 +824,43 @@
                         </div>
                     </div>
                 </section>
-                <section id="page2" class="content-section p-6 md:p-10 max-w-7xl mx-auto w-full space-y-10">
+                <section id="notes" class="content-section p-6 md:p-10 max-w-7xl mx-auto w-full space-y-10">
+                    <div class="relative overflow-hidden group bg-gradient-to-br from-primary to-primary-dark p-1 rounded-[2.5rem] shadow-2xl shadow-primary/20 mb-12">
+                        <div class="relative bg-white/5 backdrop-blur-sm p-10 lg:p-14 rounded-[2.3rem] flex flex-wrap items-center justify-between gap-8">
+                            <div class="flex flex-col gap-4 relative z-10">
+                                <div class="flex items-center gap-2 text-accent font-black text-xs tracking-[0.2em] uppercase">
+                                    <span class="material-symbols-outlined text-base">edit_note</span>
+                                    Personal Study Workspace
+                                </div>
+                                <h1 class="text-white text-5xl lg:text-6xl font-black leading-none tracking-tight text-left">My Study Notes</h1>
+                                <p class="text-blue-100/80 text-lg max-w-xl font-medium">Capture key points, ideas, and reminders. Your notes are automatically saved to your browser.</p>
+                            </div>
+                            <div class="hidden lg:block relative z-10 opacity-30">
+                                <span class="material-symbols-outlined text-[120px]">sticky_note_2</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-primary/5 border border-blue-100 dark:border-blue-900/30 relative min-h-[500px] flex flex-col">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                                    <span class="material-symbols-outlined">description</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-900 dark:text-white">Active Note Pad</h3>
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest" id="last-saved-time">All changes saved</p>
+                                </div>
+                            </div>
+                            <button onclick="clearNotes()" class="px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                                Clear All
+                            </button>
+                        </div>
+                        
+                        <textarea id="personal-notes-area" class="flex-1 w-full bg-blue-50/30 dark:bg-slate-900/40 border-2 border-dashed border-blue-100 dark:border-blue-900/20 rounded-[2rem] p-8 text-slate-700 dark:text-slate-200 focus:border-primary focus:ring-0 transition-all resize-none font-medium leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Start typing your points here..."></textarea>
+                    </div>
+                </section>
                     <div class="relative overflow-hidden group bg-gradient-to-br from-primary to-primary-dark p-1 rounded-[2.5rem] shadow-2xl shadow-primary/20 mb-12">
                         <div class="relative bg-white/5 backdrop-blur-sm p-10 lg:p-14 rounded-[2.3rem] flex flex-wrap items-center justify-between gap-8">
                             <div class="flex flex-col gap-4 relative z-10">
@@ -1160,6 +1200,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             handleRouting();
             setupSearchAndFilters();
+            setupNotes();
         });
 
         function setupSearchAndFilters() {
@@ -1219,7 +1260,10 @@
                             '7th sem': 'page4',
                             'seventh sem': 'page4',
                             '8th sem': 'page4',
-                            'eighth sem': 'page4'
+                            'eighth sem': 'page4',
+                            'notes': 'notes',
+                            'points': 'notes',
+                            'study notes': 'notes'
                         };
 
                         let foundMatch = false;
@@ -1247,7 +1291,6 @@
                                 }
                             }
                         }
-
                         // Show error if nothing found
                         if (!foundMatch) {
                             searchError.classList.remove('hidden');
@@ -1288,6 +1331,44 @@
             // Syllabus Search & Branch Filter
             const syllabusSearch = document.getElementById('syllabus-search');
             syllabusSearch?.addEventListener('input', filterSyllabus);
+        }
+
+        function setupNotes() {
+            const notesArea = document.getElementById('personal-notes-area');
+            const lastSavedText = document.getElementById('last-saved-time');
+            let saveTimeout;
+
+            if (notesArea) {
+                // Load existing notes
+                const savedNotes = localStorage.getItem('btech_box_personal_notes');
+                if (savedNotes) {
+                    notesArea.value = savedNotes;
+                }
+
+                // Auto-save on input
+                notesArea.addEventListener('input', () => {
+                    lastSavedText.textContent = 'Saving...';
+                    if (saveTimeout) clearTimeout(saveTimeout);
+                    
+                    saveTimeout = setTimeout(() => {
+                        localStorage.setItem('btech_box_personal_notes', notesArea.value);
+                        const now = new Date();
+                        lastSavedText.textContent = `Last saved at ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+                    }, 1000);
+                });
+            }
+        }
+
+        function clearNotes() {
+            if (confirm('Are you sure you want to clear all your notes? This cannot be undone.')) {
+                const notesArea = document.getElementById('personal-notes-area');
+                const lastSavedText = document.getElementById('last-saved-time');
+                if (notesArea) {
+                    notesArea.value = '';
+                    localStorage.removeItem('btech_box_personal_notes');
+                    lastSavedText.textContent = 'All notes cleared';
+                }
+            }
         }
 
         // Branch -> Semester -> PDF URL map (TKR College syllabi)
