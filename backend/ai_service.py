@@ -87,6 +87,8 @@ class UserProfile(BaseModel):
     semester: str
     roll: str
     performance: Optional[Dict[str, Any]] = None
+    notes: Optional[List[Dict[str, Any]]] = None
+    theme: Optional[str] = None
 
 
 # --- Knowledge Base ---

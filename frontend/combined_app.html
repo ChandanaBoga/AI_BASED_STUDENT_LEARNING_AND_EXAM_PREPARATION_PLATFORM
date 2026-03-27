@@ -1503,8 +1503,52 @@
             renderNotesList();
         }
 
-        function saveToStorage() {
+        async function saveToStorage() {
             localStorage.setItem('btech_box_notes_v2', JSON.stringify(notes));
+            await syncDataWithBackend();
+        }
+
+        async function syncDataWithBackend() {
+            const loggedInUser = localStorage.getItem('btech-logged-in-user');
+            if (!loggedInUser) return;
+
+            try {
+                // Fetch current profile to ensure we don't overwrite with old data
+                const response = await fetch(`${AI_BASE_URL}/load_user/${encodeURIComponent(loggedInUser)}`);
+                if (response.ok) {
+                    const profile = await response.json();
+                    profile.notes = notes;
+                    profile.theme = localStorage.getItem('btech-theme') || 'light';
+                    
+                    await fetch(`${AI_BASE_URL}/save_user`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(profile)
+                    });
+                    console.log("[Sync] Data successfully synced to backend.");
+                }
+            } catch (e) {
+                console.error("[Sync] Failed to sync with backend:", e);
+            }
+        }
+
+        function loadNotesFromProfile(profile) {
+            if (profile && profile.notes) {
+                notes = profile.notes;
+                localStorage.setItem('btech_box_notes_v2', JSON.stringify(notes));
+                renderNotesList();
+                if (notes.length > 0) {
+                    const savedActiveId = localStorage.getItem('btech_box_active_note_id');
+                    const activeNote = notes.find(n => n.id == savedActiveId) || notes[0];
+                    activeNoteId = activeNote.id;
+                    displayNote(activeNote);
+                }
+            } else {
+                // If profile has no notes, don't clear local ones yet, but set up defaults if empty
+                if (notes.length === 0) {
+                    createNewNote("My First Note", "Welcome to your personal notes!");
+                }
+            }
         }
 
         function clearNotes() {
@@ -2529,6 +2573,11 @@
         localStorage.setItem('btech-theme', theme);
         updateThemeActiveState(theme);
         closeThemeDropdown();
+        
+        // Sync theme to backend if possible
+        if (typeof syncDataWithBackend === "function") {
+            syncDataWithBackend();
+        }
     }
 
     function updateThemeActiveState(theme) {
@@ -2667,6 +2716,8 @@
                         localStorage.setItem(LOGGED_IN_USER_KEY, fullname);
                         updateUIForUser(profile);
                         if (typeof loadPerformance === "function") loadPerformance(profile);
+                        if (typeof loadNotesFromProfile === "function") loadNotesFromProfile(profile);
+                        if (profile.theme && typeof setTheme === "function") setTheme(profile.theme);
                     } else {
                         alert("Authentication Failed. Check your credentials or join us first.");
                     }
@@ -2701,6 +2752,8 @@
                     localStorage.setItem(LOGGED_IN_USER_KEY, fullname);
                     updateUIForUser(profile);
                     if (typeof loadPerformance === "function") loadPerformance(profile);
+                    if (typeof loadNotesFromProfile === "function") loadNotesFromProfile(profile);
+                    if (profile.theme && typeof setTheme === "function") setTheme(profile.theme);
                     closeLogin();
                 } else {
                     alert("Invalid Full Name or Roll Number. Please ensure your profile is created FIRST via the Profile menu.");
