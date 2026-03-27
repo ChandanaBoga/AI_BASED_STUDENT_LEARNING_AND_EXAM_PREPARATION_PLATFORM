@@ -1532,8 +1532,10 @@
             }
         }
 
-        function loadNotesFromProfile(profile) {
-            if (profile && profile.notes) {
+        async function loadNotesFromProfile(profile) {
+            if (profile && profile.notes && profile.notes.length > 0) {
+                // Backend is Source of Truth - use its notes
+                console.log("[Sync] Loading notes from backend profile.");
                 notes = profile.notes;
                 localStorage.setItem('btech_box_notes_v2', JSON.stringify(notes));
                 renderNotesList();
@@ -1544,9 +1546,23 @@
                     displayNote(activeNote);
                 }
             } else {
-                // If profile has no notes, don't clear local ones yet, but set up defaults if empty
-                if (notes.length === 0) {
+                // Backend has no notes - if we have local notes, push them to backend!
+                if (notes.length > 0) {
+                    console.log("[Sync] Backend empty, pushing local notes to server...");
+                    await syncDataWithBackend();
+                } else {
+                    // Both empty - create default
+                    console.log("[Sync] No notes found anywhere, creating default.");
                     createNewNote("My First Note", "Welcome to your personal notes!");
+                }
+            }
+            
+            // Also sync theme from profile if it exists
+            if (profile && profile.theme) {
+                console.log(`[Sync] Setting theme from profile: ${profile.theme}`);
+                // Use a flag to prevent infinite loops if setTheme calls sync
+                if (window.currentTheme !== profile.theme) {
+                    setTheme(profile.theme);
                 }
             }
         }
@@ -2564,6 +2580,7 @@
 <script>
     // --- Global Theme Helpers ---
     function setTheme(theme) {
+        window.currentTheme = theme;
         const html = document.documentElement;
         if (theme === 'dark') {
             html.classList.remove('light'); html.classList.add('dark');
@@ -2716,7 +2733,7 @@
                         localStorage.setItem(LOGGED_IN_USER_KEY, fullname);
                         updateUIForUser(profile);
                         if (typeof loadPerformance === "function") loadPerformance(profile);
-                        if (typeof loadNotesFromProfile === "function") loadNotesFromProfile(profile);
+                        if (typeof loadNotesFromProfile === "function") await loadNotesFromProfile(profile);
                         if (profile.theme && typeof setTheme === "function") setTheme(profile.theme);
                     } else {
                         alert("Authentication Failed. Check your credentials or join us first.");
@@ -2752,7 +2769,7 @@
                     localStorage.setItem(LOGGED_IN_USER_KEY, fullname);
                     updateUIForUser(profile);
                     if (typeof loadPerformance === "function") loadPerformance(profile);
-                    if (typeof loadNotesFromProfile === "function") loadNotesFromProfile(profile);
+                    if (typeof loadNotesFromProfile === "function") await loadNotesFromProfile(profile);
                     if (profile.theme && typeof setTheme === "function") setTheme(profile.theme);
                     closeLogin();
                 } else {
