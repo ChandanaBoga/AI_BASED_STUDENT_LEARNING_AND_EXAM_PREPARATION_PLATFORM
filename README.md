@@ -1,4 +1,4 @@
-# TKR College Engineering Web App (Btech Box)
+# TKR College of Engineering and Technology Web App (Btech Box)
 
 A comprehensive academic system for TKR College of Engineering and Technology, featuring an AI chatbot, quiz generator, and proctoring service.
 
