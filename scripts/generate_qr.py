@@ -1,8 +1,8 @@
 import qrcode
 import os
 
-# New GitHub Repository URL
-REPO_URL = "https://github.com/ChandanaBoga/AI_BASED_STUDENT_LEARNING_AND_EXAM_PREPARATION_PLATFORM.git"
+# Application URL (Local IP)
+REPO_URL = "http://192.168.1.4:8001/"
 
 # Output Path
 OUTPUT_PATH = os.path.join("frontend", "assets", "app_qrcode.png")
