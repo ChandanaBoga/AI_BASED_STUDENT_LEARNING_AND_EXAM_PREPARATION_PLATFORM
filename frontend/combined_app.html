@@ -32,6 +32,169 @@
         }
     </script>
     <style>
+        /* ══ Learning Velocity Glass Bar ══ */
+        #velocity-glass-bar {
+            position: relative;
+            width: 100%;
+            height: 64px;
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            border: 1.5px solid rgba(0,102,204,0.18);
+            border-radius: 20px;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 4px 32px rgba(0,102,204,0.09), 0 1.5px 6px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            transition: box-shadow .25s, border-color .25s, transform .15s;
+            user-select: none;
+        }
+        .dark #velocity-glass-bar {
+            background: rgba(10,25,47,0.55);
+            border-color: rgba(0,102,204,0.28);
+        }
+        #velocity-glass-bar:hover {
+            box-shadow: 0 8px 40px rgba(0,102,204,0.18), 0 2px 8px rgba(0,0,0,0.08);
+            border-color: rgba(0,102,204,0.38);
+            transform: translateY(-1px);
+        }
+        #velocity-glass-bar:active { transform: translateY(0px); }
+        /* Shimmer overlay */
+        #velocity-glass-bar::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(105deg,
+                rgba(255,255,255,0) 30%,
+                rgba(255,255,255,0.4) 50%,
+                rgba(255,255,255,0) 70%);
+            pointer-events: none;
+        }
+        /* The coloured fill track inside the bar */
+        #vgb-fill-track {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            border-radius: 20px;
+            background: linear-gradient(90deg, rgba(0,102,204,0.13) 0%, rgba(0,212,255,0.09) 100%);
+            transition: width 1.2s cubic-bezier(.22,1,.36,1);
+            z-index: 0;
+        }
+        #vgb-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .vgb-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            min-width: 56px;
+        }
+        .vgb-stat-val {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #0066cc;
+            line-height: 1;
+        }
+        .vgb-stat-lbl {
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            color: #94a3b8;
+        }
+        .vgb-divider {
+            width: 1px;
+            height: 28px;
+            background: rgba(0,102,204,0.13);
+        }
+        .vgb-cta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #0066cc;
+            background: rgba(0,102,204,.09);
+            border: 1.5px solid rgba(0,102,204,.15);
+            border-radius: 99px;
+            padding: 5px 14px 5px 10px;
+            transition: background .2s;
+        }
+        #velocity-glass-bar:hover .vgb-cta {
+            background: rgba(0,102,204,.16);
+        }
+        .vgb-cta-icon {
+            font-size: 16px;
+            transition: transform .3s;
+        }
+        #velocity-glass-bar.expanded .vgb-cta-icon {
+            transform: rotate(180deg);
+        }
+
+        /* ══ Expandable Cards Panel ══ */
+        #velocity-cards-panel {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height .55s cubic-bezier(.22,1,.36,1), opacity .35s ease;
+        }
+        #velocity-cards-panel.open {
+            max-height: 900px;
+            opacity: 1;
+        }
+        /* Individual velocity cards */
+        .vel-card {
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(255,255,255,0.5);
+            border-radius: 1.5rem;
+            padding: 22px 22px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+            transition: transform .2s, box-shadow .2s;
+        }
+        .dark .vel-card {
+            background: rgba(10,25,47,0.6);
+            border-color: rgba(0,102,204,0.18);
+        }
+        .vel-card:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,102,204,0.12); }
+        /* The horizontal bar inside each card */
+        .vel-card-bar-track {
+            height: 10px;
+            border-radius: 99px;
+            background: rgba(0,102,204,0.08);
+            overflow: hidden;
+            position: relative;
+        }
+        .vel-card-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 1.1s cubic-bezier(.22,1,.36,1);
+        }
+        /* Achievement card */
+        .vel-achievement {
+            border-radius: 1.5rem;
+            padding: 22px;
+            border: 2px dashed rgba(0,102,204,0.25);
+            background: rgba(0,102,204,0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 6px;
+        }
         .glass-panel {
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(16px) saturate(180%);
@@ -330,14 +493,60 @@
                     
                     <!-- Performance Dashboard Section -->
                     <section id="performance-section" style="display: none;">
-                        <div class="flex items-center justify-between mb-8 px-6">
+                        <!-- Section heading -->
+                        <div class="flex items-center justify-between mb-5 px-1">
                             <div>
-                                <h2 class="text-3xl font-black dark:text-white tracking-tight">Your Learning Velocity</h2>
-                                <p class="text-slate-500 text-sm mt-1">Real-time performance metrics from your AI quizzes</p>
+                                <h2 class="text-2xl font-black dark:text-white tracking-tight">Your Learning Velocity</h2>
+                                <p class="text-slate-400 text-xs mt-0.5 font-semibold uppercase tracking-widest">Real-time performance metrics from your AI quizzes</p>
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="performance-grid">
-                            <!-- Dynamic performance cards -->
+
+                        <!-- ★ THE HORIZONTAL GLASS BAR ★ -->
+                        <div id="velocity-glass-bar" role="button" tabindex="0"
+                             onclick="toggleVelocityPanel()"
+                             onkeydown="if(event.key==='Enter'||event.key===' ')toggleVelocityPanel()"
+                             title="Click to see your performance details">
+                            <!-- Animated fill track -->
+                            <div id="vgb-fill-track" style="width:0%"></div>
+                            <div id="vgb-content">
+                                <!-- Left: icon + label -->
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <span class="material-symbols-outlined" style="color:#0066cc;font-size:22px">speed</span>
+                                    <div>
+                                        <div style="font-size:13px;font-weight:900;color:#0f172a;" class="dark:text-white" id="vgb-label">Learning Velocity</div>
+                                        <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;">Click to view your performance</div>
+                                    </div>
+                                </div>
+                                <!-- Center: quick stats -->
+                                <div style="display:flex;align-items:center;gap:14px;">
+                                    <div class="vgb-stat">
+                                        <span class="vgb-stat-val" id="vgb-subjects">0</span>
+                                        <span class="vgb-stat-lbl">Subjects</span>
+                                    </div>
+                                    <div class="vgb-divider"></div>
+                                    <div class="vgb-stat">
+                                        <span class="vgb-stat-val" id="vgb-attempts">0</span>
+                                        <span class="vgb-stat-lbl">Attempts</span>
+                                    </div>
+                                    <div class="vgb-divider"></div>
+                                    <div class="vgb-stat">
+                                        <span class="vgb-stat-val" id="vgb-avg">0%</span>
+                                        <span class="vgb-stat-lbl">Avg Score</span>
+                                    </div>
+                                </div>
+                                <!-- Right: CTA -->
+                                <div class="vgb-cta">
+                                    <span class="material-symbols-outlined vgb-cta-icon">expand_more</span>
+                                    View Details
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ★ EXPANDABLE CARDS PANEL ★ -->
+                        <div id="velocity-cards-panel">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-5" id="performance-grid">
+                                <!-- Dynamic performance cards injected by JS -->
+                            </div>
                         </div>
                     </section>
                     
@@ -374,6 +583,8 @@
                         </div>
                     </div>
                 </section>
+
+
 
                 <!-- Departments Section -->
                 <section id="departments" class="content-section p-6 md:p-10 max-w-7xl mx-auto w-full">
@@ -2304,77 +2515,102 @@
 
             const activeModules = Object.entries(performance).filter(([k,v]) => v.attempts > 0);
             console.log(`[Dashboard] updateDashboard called. Active Modules: ${activeModules.length}`);
-            
+
             if (activeModules.length > 0) {
                 section.style.display = 'block';
                 const configs = {
                     moderate: { name: 'Foundation Concepts', icon: 'functions', color: '#10b981' },
-                    high: { name: 'Core Engineering', icon: 'database', color: '#3b82f6' },
-                    advance: { name: 'Advanced Problem Solving', icon: 'terminal', color: '#a855f7' }
+                    high:     { name: 'Core Engineering',    icon: 'database',  color: '#3b82f6' },
+                    advance:  { name: 'Advanced Problems',   icon: 'terminal',  color: '#a855f7' }
                 };
-                // Build a readable name from subject quiz keys like 'sem1-c-programming'
-                function getSubjectConfig(key) {
-                    const name = key
-                        .replace(/^sem(\d+)-/, 'Sem $1 — ')
-                        .replace(/-/g, ' ')
-                        .replace(/\b\w/g, c => c.toUpperCase());
-                    const colors = ['#f59e0b', '#ec4899', '#06b6d4', '#8b5cf6', '#14b8a6', '#f97316'];
-                    const color = colors[Math.abs(key.split('').reduce((h,c)=>((h<<5)-h+c.charCodeAt(0))|0,0)) % colors.length];
+                function getSubjectConfig(k) {
+                    const name = k.replace(/^sem(\d+)-/, 'Sem $1 — ').replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+                    const palette = ['#f59e0b','#ec4899','#06b6d4','#8b5cf6','#14b8a6','#f97316'];
+                    const color   = palette[Math.abs(k.split('').reduce((h,c)=>((h<<5)-h+c.charCodeAt(0))|0,0)) % palette.length];
                     return { name, icon: 'school', color };
                 }
+
+                // Overall stats for the glass bar
+                const totalAttempts = activeModules.reduce((a,[,d]) => a + d.attempts, 0);
+                let sumPerc = 0;
+                activeModules.forEach(([k, d]) => {
+                    let t = (typeof quizData!=='undefined' && quizData[k]) ? quizData[k].length : (d.totalQuestions || 10);
+                    sumPerc += Math.min(100, Math.round((d.bestScore / t) * 100));
+                });
+                const avgPerc = Math.round(sumPerc / activeModules.length);
+
+                // Update glass bar elements
+                const el = id => document.getElementById(id);
+                if (el('vgb-subjects')) el('vgb-subjects').textContent = activeModules.length;
+                if (el('vgb-attempts')) el('vgb-attempts').textContent = totalAttempts;
+                if (el('vgb-avg'))      el('vgb-avg').textContent      = avgPerc + '%';
+                if (el('vgb-fill-track')) setTimeout(() => { el('vgb-fill-track').style.width = avgPerc + '%'; }, 80);
+
+                // Render velocity cards
                 grid.innerHTML = activeModules.map(([key, data]) => {
                     const conf = configs[key] || getSubjectConfig(key);
-                    // Use quizData length if available, otherwise fallback to stored total or default to 10
-                    let total = 10;
-                    if (typeof quizData !== 'undefined' && quizData[key]) {
-                        total = quizData[key].length;
-                    } else {
-                        total = data.totalQuestions || 10;
-                    }
-                    const perc = Math.min(100, Math.round((data.bestScore / total) * 100));
+                    const total = (typeof quizData!=='undefined' && quizData[key]) ? quizData[key].length : (data.totalQuestions || 10);
+                    const perc  = Math.min(100, Math.round((data.bestScore / total) * 100));
+                    const grade = perc>=90 ? '🏆 Excellent' : perc>=70 ? '✅ Good' : perc>=50 ? '📘 Average' : '📉 Needs Work';
                     return `
-                        <div class="glass-card p-6 rounded-[2rem] border-white/60 shadow-sm flex flex-col items-start hover:shadow-xl transition-all duration-300">
-                            <div class="flex justify-between w-full mb-4">
-                                <div class="size-10 rounded-xl flex items-center justify-center" style="background-color: ${conf.color}1a; color: ${conf.color}">
-                                    <span class="material-symbols-outlined text-xl">${conf.icon}</span>
+                        <div class="vel-card">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:${conf.color}1a;">
+                                    <span class="material-symbols-outlined" style="color:${conf.color};font-size:20px">${conf.icon}</span>
                                 </div>
-                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">${data.attempts} Attempts</span>
+                                <span style="font-size:9px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em">${data.attempts} Attempt${data.attempts!==1?'s':''}</span>
                             </div>
-                            <h4 class="text-lg font-black dark:text-white mb-2">${conf.name}</h4>
-                            <div class="w-full mt-auto">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase">Best Score</span>
-                                    <span class="text-sm font-black text-primary">${data.bestScore} <span class="text-[10px] text-slate-400">/ ${total}</span></span>
-                                </div>
-                                <div class="h-1.5 w-full bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
-                                    <div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: ${perc}%"></div>
-                                </div>
+                            <div>
+                                <div style="font-size:15px;font-weight:900;color:#0f172a">${conf.name}</div>
+                                <div style="font-size:10px;font-weight:700;color:${conf.color};margin-top:2px">${grade}</div>
                             </div>
+                            <div>
+                                <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                                    <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">Best Score</span>
+                                    <span style="font-size:12px;font-weight:900;color:${conf.color}">${data.bestScore}<span style="font-size:9px;color:#94a3b8;font-weight:700"> / ${total}</span></span>
+                                </div>
+                                <div class="vel-card-bar-track">
+                                    <div class="vel-card-bar-fill" id="vcbar-${key}" style="width:0%;background:linear-gradient(90deg,${conf.color},${conf.color}88)"></div>
+                                </div>
+                                <div style="text-align:right;font-size:9px;font-weight:800;color:#94a3b8;margin-top:4px">${perc}% accuracy</div>
+                            </div>
+                        </div>`;
+                }).join('') + `
+                    <div class="vel-achievement">
+                        <div style="width:52px;height:52px;border-radius:50%;background:rgba(0,102,204,.1);display:flex;align-items:center;justify-content:center;">
+                            <span class="material-symbols-outlined" style="font-size:30px;color:#0066cc">emoji_events</span>
                         </div>
-                    `;
-                }).join('');
-                
-                // Add Overall achievement summary card
-                const totalAttempts = activeModules.reduce((acc, [_,d]) => acc + d.attempts, 0);
-                const avgScore = Math.round(activeModules.reduce((acc, [_,d]) => acc + (d.bestScore/20)*100, 0) / activeModules.length);
-                
-                grid.insertAdjacentHTML('beforeend', `
-                    <div class="glass-card p-8 rounded-[2rem] border-primary/20 bg-primary/5 flex flex-col justify-center items-center text-center group hover:bg-primary/10 transition-all border-dashed border-2">
-                        <div class="size-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                            <span class="material-symbols-outlined text-4xl">emoji_events</span>
-                        </div>
-                        <h4 class="text-2xl font-black text-primary mb-1">Expert Level</h4>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">${totalAttempts} Total Quizzes Done</p>
-                        <div class="mt-6 px-6 py-2 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full">
-                            Verified Achievement
-                        </div>
-                    </div>
-                `);
+                        <div style="font-size:1.1rem;font-weight:900;color:#0066cc">Expert Level</div>
+                        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8">${totalAttempts} Total Quizzes Done</div>
+                        <div style="margin-top:8px;padding:5px 18px;background:#0066cc;color:#fff;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.15em;border-radius:99px;">Verified Achievement</div>
+                    </div>`;
+
+                // Animate card bars with slight delay
+                setTimeout(() => {
+                    activeModules.forEach(([key, data]) => {
+                        const total = (typeof quizData!=='undefined' && quizData[key]) ? quizData[key].length : (data.totalQuestions || 10);
+                        const perc  = Math.min(100, Math.round((data.bestScore / total) * 100));
+                        const bar = document.getElementById('vcbar-' + key);
+                        if (bar) bar.style.width = perc + '%';
+                    });
+                }, 150);
 
             } else {
                 section.style.display = 'none';
             }
         }
+
+        // ── Toggle the expandable velocity cards panel ───────────────────
+        function toggleVelocityPanel() {
+            const bar   = document.getElementById('velocity-glass-bar');
+            const panel = document.getElementById('velocity-cards-panel');
+            if (!bar || !panel) return;
+            const isOpen = panel.classList.contains('open');
+            panel.classList.toggle('open',     !isOpen);
+            bar.classList.toggle('expanded',   !isOpen);
+        }
+        window.toggleVelocityPanel = toggleVelocityPanel;
+
 
         let currentModule = '';
         let currentQuestions = [];

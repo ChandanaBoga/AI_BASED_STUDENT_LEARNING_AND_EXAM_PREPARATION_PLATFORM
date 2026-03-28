@@ -11,14 +11,16 @@ Welcome to the **Btech Box** application guide. This document provides a compreh
 
 ### 📊 1. Academic Dashboard
 The central hub of the application, providing quick access to all vital modules:
-- **Live System Status**: Real-time indicator of application health.
+- **Your Learning Velocity**: An interactive, horizontal glass bar that provides real-time performance summaries (Subjects, Attempts, Avg Score). Clicking the bar expands it into a detailed subject-performance grid.
+- **Detailed Subject Cards**: Within the expanded view, each subject is represented by a glassmorphic card showing its best score, attempts count, and an animated accuracy bar.
 - **Quick Action Cards**: Fast navigation to Study Materials, AI Quiz, and the Curriculum Hub.
 - **Department Overview**: Direct links to explore specific college divisions like CSE, CSM, ECE, etc.
 
 ### 🤖 2. Study with AI (Llama 3.2 Powered)
 An intelligent chat interface that acts as your personal academic assistant:
 - **Interactive Chat**: Ask questions about your curriculum, specific subjects, or general academic queries.
-- **Local AI Processing**: Uses a locally hosted **llama3.2:3b** model via Ollama for privacy and speed.
+- **AI Quiz Generation**: Effortlessly generate custom quizzes based on any topic of your choice.
+- **Real-time Results**: Receive immediate feedback on your performance with automated scoring and an "Average Score" tracking system.
 - **Structured Responses**: Provides bolded key terms, bulleted lists, and clickable resource links.
 
 ### 📚 3. Curriculum Hub (Syllabus)
@@ -32,19 +34,24 @@ A powerful search bar located in the top navigation that allows you to:
 - **Filter Resources**: Instantly find specific semesters or topics.
 - **SPA Navigation**: Directly navigate to relevant sections based on your search terms.
 
+### 👤 5. Personalization & Sync
+Btech Box provides a persistent experience for authenticated users:
+- **User Profiles**: Login to access personalized performance metrics and historical data.
+- **Cloud Synchronization**: Your quiz scores and "Learning Velocity" stats are periodically synced with the backend, allowing you to pick up exactly where you left off on any device.
+
 ---
 
 ## 🛠 Technical Architecture
 
 ### Frontend
 - **Framework**: Single Page Application (SPA) architecture.
-- **Styling**: Tailwind CSS with custom glassmorphism effects and dark mode support.
-- **Icons**: Material Symbols Outlined.
+- **Styling**: Vanilla CSS and Tailwind CSS for glassmorphism effects and dark mode.
+- **Interactivity**: Dynamic "Learning Velocity" dashboard with animated progress bars and expandable sections.
 
 ### Backend
 - **API Server**: FastAPI (available on port `8001`).
-- **AI Engine**: Ollama running the `llama3.2:3b` model.
-- **Storage**: Local asset-based resource management (`assets/resources/R22/`).
+- **AI Engine**: Ollama running the `llama3.2:3b` model for chat and `moondream:1.8b` for proctoring.
+- **Data Persistence**: JSON-based user data storage with automated backend synchronization.
 
 ---
 
@@ -52,21 +59,21 @@ A powerful search bar located in the top navigation that allows you to:
 
 ### Prerequisites
 - **Python 3.10+**: For running the backend server.
-- **Ollama**: Installed and running with the `llama3.2:3b` model pulled.
+- **Ollama**: Installed and running with the `llama3.2:3b` and `moondream:1.8b` models pulled.
 
 ### Running the Application
-1. **Start the Backend**:
+1. **Start the Orchestrator**:
    ```bash
-   # Navigate to the project root
-   backend\venv\Scripts\python.exe backend\ai_service.py
+   # Navigate to the project root and run the launcher
+   python launcher_app.py
    ```
-2. **Open the Frontend**:
-   Simply open [frontend/combined_app.html](file:///c:/Program%20Files/webapp/frontend/combined_app.html) in any modern web browser.
+2. **Access the Portal**:
+   Simply open `http://localhost:8001/` in any modern web browser.
 
-### Using the AI Assistant
+### Using the AI Assistant & Quizzes
 - Ensure the backend server is running.
-- Navigate to the **"Study with AI"** tab.
-- Type your question and interact with the assistant.
+- Navigate to **"Study with AI"** or **"AI-Powered Quiz"**.
+- For custom quizzes, enter a topic and click "Generate".
 
 ---
 
@@ -80,8 +87,8 @@ Syllabus files are systematically organized in:
 ---
 
 ## 🎯 Tips for Success
-- Use the **Global Search** if you're looking for a specific semester's resources quickly.
-- Toggle the **Dark Mode** for a more comfortable reading experience at night.
-- Keep your **Ollama** service updated for the best AI response performance.
+- **Verify your progress** regularly using the "Learning Velocity" bar on the dashboard.
+- Utilize the **AI Quiz** feature to test yourself on difficult subjects.
+- Toggle **Dark Mode** for a more focused experience during late-night study sessions.
 
 Good luck with your studies! 🎯

@@ -261,20 +261,24 @@ async def chat_stream_endpoint(request: ChatRequest):
 
 # --- Quiz Generation ---
 def _extract_json_from_llm_response(raw: str) -> str:
-    """Robustly extracts JSON array from LLM output using regex."""
+    """Robustly extracts JSON array from LLM output."""
     raw = raw.strip()
-    # Try to find the first '[' and last ']' for an array
-    import re
-    match = re.search(r'(\[.*\])', raw, re.DOTALL)
-    if match:
-        return match.group(1).strip()
-    # Fallback to the original cleaning logic if regex fails
+    
+    # Try to find the outermost brackets []
+    start = raw.find('[')
+    end = raw.rfind(']')
+    
+    if start != -1 and end != -1 and end > start:
+        return raw[start:end+1]
+        
+    # Fallback: remove markdown code fences if they exist
     if raw.startswith("```"):
         first_newline = raw.find("\n")
         if first_newline != -1:
             raw = raw[first_newline + 1:]
         if raw.endswith("```"):
             raw = raw[:-3]
+            
     return raw.strip()
 
 
@@ -318,6 +322,10 @@ async def generate_quiz(request: QuizRequest):
             asyncio.to_thread(
                 ollama.chat,
                 model='llama3.2:3b',
+                messages=[
+                    {'role': 'system', 'content': system_prompt},
+                    {'role': 'user',   'content': prompt},
+                ]
             ),
             timeout=180.0
         )

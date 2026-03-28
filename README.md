@@ -3,9 +3,11 @@
 A comprehensive academic system for TKR College of Engineering and Technology, featuring an AI chatbot, quiz generator, and proctoring service.
 
 ## Key Improvements
-- **AI Quiz Generation**: Robust regex-based parsing ensures valid JSON extraction, resolving previous formatting errors.
+- **Interactive Performance Analytics**: A new horizontal glass bar on the dashboard provides real-time "Learning Velocity" metrics (Subjects, Attempts, Avg Score) that expand into a detailed subject-performance grid.
+- **AI Quiz Generation**: Robust regex-based parsing ensures valid JSON extraction, resolving previous formatting errors and allowing for custom topic-based quizzes.
+- **Cloud Profile Sync**: Seamless synchronization of performance and profile data with the backend ensures user progress is persistent across sessions.
 - **Chatbot Accuracy**: Expanded knowledge base context and department-specific trigger keywords (e.g., HOD of AIML) for highly accurate responses.
-- **Integrated Proctoring**: Moondream-based distraction analysis for secure academic assessments.
+- **Integrated Proctoring**: Moondream-based distraction analysis for secure academic assessments during AI Quizzes.
 - **Global Search Bar**: Real-time results dropdown for instant access to quizzes, syllabi, notes, and academic resources.
 
 ## Setup and Installation
