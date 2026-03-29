@@ -57,7 +57,7 @@ if not os.path.exists(UPLOADS_DIR):
 app.mount("/data/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
 # --- Proctor Proxy ---
-PROCTOR_BASE_URL = "http://localhost:5050"
+PROCTOR_BASE_URL = "http://127.0.0.1:5050"
 
 @app.post("/analyze")
 async def proxy_analyze(request: Request):
@@ -103,6 +103,7 @@ class UserProfile(BaseModel):
     theme: Optional[str] = None
     photo_url: Optional[str] = None
     resume_url: Optional[str] = None
+    password: Optional[str] = None
 
 class CodeExecuteRequest(BaseModel):
     language: str
@@ -379,6 +380,35 @@ async def load_user(fullname: str):
         raise
     except Exception as e:
         logger.error(f"[/load_user] Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/update_password")
+async def update_password(request: Request):
+    try:
+        body = await request.json()
+        fullname = body.get("fullname")
+        new_password = body.get("new_password")
+        
+        if not fullname or not new_password:
+            raise HTTPException(status_code=400, detail="Missing fullname or new_password")
+
+        filename = f"{fullname.replace(' ', '_').lower()}.json"
+        path = os.path.join(USERS_DIR, filename)
+        if not os.path.exists(path):
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        data['password'] = new_password
+        
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2)
+            
+        return {"status": "success", "message": "Password updated."}
+    except Exception as e:
+        logger.error(f"[/update_password] Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

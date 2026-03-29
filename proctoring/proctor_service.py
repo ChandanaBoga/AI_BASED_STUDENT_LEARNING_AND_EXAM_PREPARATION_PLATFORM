@@ -147,6 +147,6 @@ def analyze():
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PROCTOR_PORT", 5050))
-    print(f"[Proctor] Starting Production Server on http://localhost:{port} (Ollama Mode)")
+    print(f"[Proctor] Starting Production Server on http://127.0.0.1:{port} (Ollama Mode)")
     # Using waitress for production-ready serving on Windows
     serve(app, host="0.0.0.0", port=port)
