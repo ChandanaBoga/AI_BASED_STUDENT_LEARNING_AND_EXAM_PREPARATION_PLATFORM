@@ -100,7 +100,7 @@
     }
 
     // ── Show warning popup ─────────────────────────────────────────────────
-    function showWarning(isFinal) {
+    function showWarning(isFinal, type = "distraction") {
         if (overlayVisible) return;
         overlayVisible = true;
 
@@ -135,9 +135,18 @@
         } else {
             const remaining = CONFIG.maxWarnings - warningCount;
             title.textContent   = "⚠️ Activity Detected!";
-            message.innerHTML   =
-                `Our system detected you may not be focused on the quiz.<br>
-                 <strong>${remaining} chance${remaining !== 1 ? "s" : ""} remaining</strong>.`;
+            
+            if (type === "multi_person") {
+                message.innerHTML =
+                    `<strong>Multiple people detected in frame!</strong><br>
+                     Please ensure you are alone while taking the quiz.<br>
+                     <strong>${remaining} chance${remaining !== 1 ? "s" : ""} remaining</strong>.`;
+            } else {
+                message.innerHTML =
+                    `Our system detected you may not be focused on the quiz.<br>
+                     <strong>${remaining} chance${remaining !== 1 ? "s" : ""} remaining</strong>.`;
+            }
+
             btn.innerHTML = `I Understand`;
             btn.onclick   = dismissWarning;
         }
@@ -251,10 +260,11 @@
             
             console.debug("[Proctor] AI Reaction:", data);
 
-            if (data.is_distracted) {
+            if (data.is_distracted || data.is_multi_person) {
                 warningCount++;
-                console.warn(`[Proctor] Warning ${warningCount} - Reason: ${data.description}`);
-                showWarning(warningCount >= CONFIG.maxWarnings);
+                const violationType = data.is_multi_person ? "multi_person" : "distraction";
+                console.warn(`[Proctor] Warning ${warningCount} - Type: ${violationType} - Reason: ${data.description}`);
+                showWarning(warningCount >= CONFIG.maxWarnings, violationType);
             }
         } catch (err) {
             console.warn("[Proctor] Backend communication failed:", err.message);

@@ -30,11 +30,10 @@ log = logging.getLogger("proctor")
 
 DISTRACTION_PROMPT = (
     "Analyze this webcam image carefully. "
-    "Is the person's face oriented towards the screen? "
-    "Are they looking away, looking at their lap, or looking significantly to the side? "
-    "If they are clearly focused on the screen, answer 'no'. "
-    "If they are looking away, using a phone, talking, or clearly inattentive, answer 'yes'. "
-    "Answer with ONLY one word: 'yes' or 'no'."
+    "Check for two specific conditions: "
+    "1. Is the student distracted (looking away, on a phone, or inattentive)? "
+    "2. Is there ANY other person visible in the image besides the student? "
+    "Answer in this format: Distracted: [Yes/No], Multiple People: [Yes/No]."
 )
 
 
@@ -73,14 +72,24 @@ def analyze_frame(image: Image.Image) -> dict:
         raw_answer = response.message.content if response.message else ""
         answer = raw_answer.strip().lower()
         
-        # Logic: Simple yes/no detection
-        is_distracted = "yes" in answer and "no" not in answer
+        # Logic: Parse the formatted answer
+        # Search for yes/no for each specific condition
+        is_distracted = "distracted: yes" in answer or ("distracted: yes" not in answer and "yes" in answer.split(",")[0] if "," in answer else "yes" in answer)
+        # More robust parsing:
+        is_distracted = "distracted: yes" in answer
+        is_multi_person = "multiple people: yes" in answer or "multiple: yes" in answer
         
-        log.info(f"[Proctor] Ollama Raw: '{raw_answer}' | Distracted: {is_distracted}")
+        # Fallback for simpler responses if LLM ignores format
+        if not ("distracted:" in answer or "multiple people:" in answer):
+            is_distracted = "yes" in answer and "no" not in answer
+            is_multi_person = False # Can't be sure
+            
+        log.info(f"[Proctor] Ollama Raw: '{raw_answer}' | Distracted: {is_distracted} | Multi: {is_multi_person}")
         
         return {
             "is_distracted": is_distracted,
-            "description": answer[:100]
+            "is_multi_person": is_multi_person,
+            "description": answer[:200]
         }
 
     except Exception as exc:
