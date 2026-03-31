@@ -93,11 +93,11 @@ class QuizRequest(BaseModel):
 
 class UserProfile(BaseModel):
     fullname: str
-    age: str
-    dob: str
-    year: str
-    semester: str
-    roll: str
+    age: Optional[str] = ""
+    dob: Optional[str] = ""
+    year: Optional[str] = ""
+    semester: Optional[str] = ""
+    roll: Optional[str] = ""
     performance: Optional[Dict[str, Any]] = None
     notes: Optional[List[Dict[str, Any]]] = None
     theme: Optional[str] = None
@@ -358,11 +358,51 @@ async def save_user(profile: UserProfile):
     try:
         if not os.path.exists(USERS_DIR):
             os.makedirs(USERS_DIR)
+        
         filename = f"{profile.fullname.replace(' ', '_').lower()}.json"
         path = os.path.join(USERS_DIR, filename)
+        
+        incoming_data = profile.model_dump()
+        final_data = incoming_data
+
+        if os.path.exists(path):
+            with open(path, 'r', encoding='utf-8') as f:
+                existing_data = json.load(f)
+            
+            # PROTECTION: If incoming notes are empty but existing profile has notes,
+            # we preserve the existing notes to prevent race-condition erasure.
+            if not incoming_data.get('notes') and existing_data.get('notes'):
+                logger.warning(f"[Security] Preserving existing notes for {profile.fullname} (incoming notes were empty).")
+                incoming_data['notes'] = existing_data['notes']
+            
+            # Merge performance data intelligently (keep best scores from both if they differ)
+            if incoming_data.get('performance') and existing_data.get('performance'):
+                for key, val in existing_data['performance'].items():
+                    if key not in incoming_data['performance']:
+                        incoming_data['performance'][key] = val
+                    else:
+                        # Keep best score if both have it
+                        if isinstance(val, dict) and isinstance(incoming_data['performance'][key], dict):
+                            incoming_data['performance'][key]['bestScore'] = max(
+                                incoming_data['performance'][key].get('bestScore', 0),
+                                val.get('bestScore', 0)
+                            )
+                            incoming_data['performance'][key]['attempts'] = max(
+                                incoming_data['performance'][key].get('attempts', 0),
+                                val.get('attempts', 0)
+                            )
+
+            # Preserve fields that might be missing in a partial sync (like password or uploads)
+            for key, val in existing_data.items():
+                if not incoming_data.get(key) and val:
+                    incoming_data[key] = val
+            
+            final_data = incoming_data
+
         with open(path, 'w', encoding='utf-8') as f:
-            json.dump(profile.model_dump(), f, indent=2)
-        return {"status": "success", "message": f"User {profile.fullname} saved."}
+            json.dump(final_data, f, indent=2)
+            
+        return {"status": "success", "message": f"User {profile.fullname} saved with data protection."}
     except Exception as e:
         logger.error(f"[/save_user] Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

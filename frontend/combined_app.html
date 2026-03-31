@@ -2202,10 +2202,11 @@
                 activeNoteId = localStorage.getItem('btech_box_active_note_id');
             }
 
-            if (notes.length === 0) {
-                // Create a default note if empty
+            // Only create a default note if we are a guest and have nothing
+            const loggedInUser = localStorage.getItem('btech-logged-in-user');
+            if (notes.length === 0 && !loggedInUser) {
                 createNewNote("My First Note", "Welcome to your personal notes! You can create multiple notes using the sidebar.");
-            } else {
+            } else if (notes.length > 0) {
                 renderNotesList();
                 if (activeNoteId) {
                     const activeNote = notes.find(n => n.id == activeNoteId);
@@ -2350,33 +2351,36 @@
             if (!loggedInUser) return;
 
             try {
-                // Fetch current profile to preserve fields we might not have in local state (like age, roll, etc.)
+                // Fetch current profile to preserve other fields
                 const response = await fetch(`${AI_BASE_URL}/load_user/${encodeURIComponent(loggedInUser)}`);
                 let profile = {};
                 if (response.ok) {
                     profile = await response.json();
-                } else {
-                    // Fallback for new users or if fetch fails
-                    const savedProfile = localStorage.getItem('btech-profile');
-                    if (savedProfile) profile = JSON.parse(savedProfile);
                 }
 
                 // Update with latest local data
                 profile.fullname = loggedInUser;
                 profile.notes = notes;
+                
+                // Also sync performance and theme
                 const perfKey = `tkr_quiz_performance_${loggedInUser.replace(/\s+/g, '_').toLowerCase()}`;
                 const localPerf = localStorage.getItem(perfKey);
                 if (localPerf) profile.performance = JSON.parse(localPerf);
                 profile.theme = localStorage.getItem('btech-theme') || 'light';
 
-                await fetch(`${AI_BASE_URL}/save_user`, {
+                const saveResponse = await fetch(`${AI_BASE_URL}/save_user`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(profile)
                 });
-                console.log("[Sync] User profile unified and synced to backend.");
+                
+                if (saveResponse.ok) {
+                    console.log("[Sync] User notes and profile successfully saved to backend.");
+                } else {
+                    console.error("[Sync] Backend save failed:", await saveResponse.text());
+                }
             } catch (e) {
-                console.error("[Sync] Unified sync failed:", e);
+                console.error("[Sync] Error during background synchronization:", e);
             }
         }
 
@@ -2385,11 +2389,31 @@
             console.log(`[Sync] Loading full profile for: ${profile.fullname}`);
 
             // 1. Sync Notes
-            if (profile.notes && profile.notes.length > 0) {
+            if (profile.notes) {
                 notes = profile.notes;
+                // If the user has no notes yet, give them a personalized welcome note
+                if (notes.length === 0) {
+                    notes.push({
+                        id: Date.now(),
+                        title: `Welcome, ${profile.fullname}!`,
+                        content: "Start your academic journey by taking notes here.",
+                        lastModified: new Date().toISOString()
+                    });
+                }
             }
+            
             localStorage.setItem('btech_box_notes_v2', JSON.stringify(notes));
+            
+            // Re-initialize the active note from the loaded set
+            if (notes.length > 0) {
+                activeNoteId = notes[0].id;
+                localStorage.setItem('btech_box_active_note_id', activeNoteId);
+            }
+
             if (typeof renderNotesList === "function") renderNotesList();
+            if (notes.length > 0 && typeof displayNote === "function") {
+                displayNote(notes[0]);
+            }
 
             // 2. Sync Theme
             if (profile.theme) {
@@ -2402,7 +2426,6 @@
             if (profile.performance) {
                 const perfKey = `tkr_quiz_performance_${profile.fullname.replace(/\s+/g, '_').toLowerCase()}`;
                 localStorage.setItem(perfKey, JSON.stringify(profile.performance));
-                // If the dashboard script is loaded, update its internal state
                 if (typeof window.loadPerformance === "function") {
                     window.loadPerformance(profile);
                 }
@@ -2413,7 +2436,7 @@
                 window.updateUIForUser(profile);
             }
 
-            // 5. Redirect to Dashboard (User Request)
+            // 5. Redirect to Dashboard
             window.location.hash = '#dashboard';
         }
 
