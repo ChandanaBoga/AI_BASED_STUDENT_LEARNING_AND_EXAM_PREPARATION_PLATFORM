@@ -28,7 +28,7 @@
 
     const CONFIG = {
         backendUrl        : getBaseUrl() + "/analyze",
-        captureIntervalMs : 5000,       // check every 5 s
+        captureIntervalMs : 2500,       // check every 2.5 s
         maxWarnings       : 5,
         jpegQuality       : 0.7,        // slightly higher quality
         captureWidth      : 640,
