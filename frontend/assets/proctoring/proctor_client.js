@@ -155,6 +155,12 @@
         overlay.setAttribute("style", "display: flex !important");
     }
 
+    // ── Manual UI Test Function (Exposed to window for debugging) ──────────
+    window.TriggerProctorTest = function(type = "distraction") {
+        console.log(`[Proctor] Manual UI Test Triggered: ${type}`);
+        showWarning(false, type);
+    };
+
     // ── Dismiss non-final warning ──────────────────────────────────────────
     function dismissWarning() {
         const overlay = document.getElementById("proctor-overlay");
@@ -258,12 +264,13 @@
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
             const data = await resp.json();
             
-            console.debug("[Proctor] AI Reaction:", data);
+            console.debug("[Proctor] AI Raw Response:", data.description);
+            console.log(`[Proctor] Analysis -> Distracted: ${data.is_distracted} | Multi-Person: ${data.is_multi_person}`);
 
             if (data.is_distracted || data.is_multi_person) {
                 warningCount++;
                 const violationType = data.is_multi_person ? "multi_person" : "distraction";
-                console.warn(`[Proctor] Warning ${warningCount} - Type: ${violationType} - Reason: ${data.description}`);
+                console.warn(`[Proctor] Violation Detected! Count: ${warningCount}/${CONFIG.maxWarnings} | Type: ${violationType}`);
                 showWarning(warningCount >= CONFIG.maxWarnings, violationType);
             }
         } catch (err) {

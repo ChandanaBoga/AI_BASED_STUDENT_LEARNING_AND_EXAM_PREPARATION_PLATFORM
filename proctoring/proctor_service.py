@@ -29,11 +29,11 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO,
 log = logging.getLogger("proctor")
 
 DISTRACTION_PROMPT = (
-    "Analyze this webcam image carefully. "
-    "Check for two specific conditions: "
-    "1. Is the student distracted (looking away, on a phone, or inattentive)? "
-    "2. Is there ANY other person visible in the image besides the student? "
-    "Answer in this format: Distracted: [Yes/No], Multiple People: [Yes/No]."
+    "Analyze this webcam image for a proctoring system. "
+    "Is the student distracted or looking away (yes/no)? "
+    "Is there any other person in the frame (yes/no)? "
+    "Respond exactly in this format: "
+    "IS_DISTRACTED: [YES/NO] | MULTIPLE_PEOPLE: [YES/NO]"
 )
 
 
@@ -52,6 +52,12 @@ def decode_image(b64_string: str) -> Image.Image:
 def analyze_frame(image: Image.Image) -> dict:
     """Run Moondream via Ollama on a single frame and return structured result."""
     try:
+        # Save a debug frame to see what AI sees
+        debug_dir = os.path.join(os.path.dirname(__file__), "debug_frames")
+        if not os.path.exists(debug_dir):
+            os.makedirs(debug_dir)
+        image.save(os.path.join(debug_dir, "last_frame.jpg"))
+
         # Convert PIL image to bytes for Ollama
         img_byte_arr = io.BytesIO()
         image.save(img_byte_arr, format='JPEG')
@@ -72,30 +78,32 @@ def analyze_frame(image: Image.Image) -> dict:
         raw_answer = response.message.content if response.message else ""
         answer = raw_answer.strip().lower()
         
-        # Logic: Parse the formatted answer
-        # Search for yes/no for each specific condition
-        is_distracted = "distracted: yes" in answer or ("distracted: yes" not in answer and "yes" in answer.split(",")[0] if "," in answer else "yes" in answer)
-        # More robust parsing:
-        is_distracted = "distracted: yes" in answer
-        is_multi_person = "multiple people: yes" in answer or "multiple: yes" in answer
-        
-        # Fallback for simpler responses if LLM ignores format
-        if not ("distracted:" in answer or "multiple people:" in answer):
-            is_distracted = "yes" in answer and "no" not in answer
-            is_multi_person = False # Can't be sure
-            
-        log.info(f"[Proctor] Ollama Raw: '{raw_answer}' | Distracted: {is_distracted} | Multi: {is_multi_person}")
+        log.info(f"[Proctor] Raw AI Response: '{raw_answer}'")
+
+        # Robust Boolean Detection
+        is_distracted = "is_distracted: yes" in answer or "distracted: yes" in answer
+        is_multi_person = "multiple_people: yes" in answer or "multiple: yes" in answer or "people: yes" in answer
+
+        # Fail-Safe: If coordinates (e.g. [0.1, 0.2]) are returned, it likely found someone
+        if not is_multi_person and ("[" in raw_answer and "]" in raw_answer):
+            log.warning("[Proctor] Detected coordinates in response. Flagging as Multi-Person presence.")
+            is_multi_person = True
+
+        # Fallback for simple "yes"
+        if not is_distracted and not is_multi_person:
+            if answer == "yes": is_distracted = True
+
+        log.info(f"[Proctor] Final Decision -> Distracted: {is_distracted} | Multi-Person: {is_multi_person}")
         
         return {
             "is_distracted": is_distracted,
             "is_multi_person": is_multi_person,
-            "description": answer[:200]
+            "description": raw_answer[:255]
         }
 
     except Exception as exc:
         log.error(f"Ollama Moondream inference failed: {exc}")
-        return {"is_distracted": False, "description": f"error: {exc}"}
-
+        return {"is_distracted": False, "is_multi_person": False, "description": f"error: {exc}"}
 
 
 # ---------------------------------------------------------------------------
@@ -111,13 +119,10 @@ def health():
         models = getattr(models_info, 'models', []) or []
         available_models = [m.model for m in models if m.model]
         
-        # If the above fails to get names, try a simpler check if possible
-        # or just assume it's there if list() didn't raise
-        
         model_ready = any(MODEL_NAME in m for m in available_models)
         
         if not model_ready:
-            log.warning(f"Health check failed: Model {MODEL_NAME} not found in {available_models}")
+            log.warning(f"Health check failed: Model {MODEL_NAME} not found")
             return jsonify({
                 "status": "error", 
                 "message": f"Model {MODEL_NAME} not found. Please run 'ollama pull {MODEL_NAME}'",
@@ -147,7 +152,6 @@ def analyze():
         return jsonify({"error": f"Invalid image data: {exc}"}), 400
 
     result = analyze_frame(image)
-    log.info("Analysis result: %s", result)
     return jsonify(result)
 
 
