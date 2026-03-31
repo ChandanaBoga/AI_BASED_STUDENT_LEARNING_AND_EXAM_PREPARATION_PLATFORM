@@ -2916,7 +2916,9 @@
             </div>
             <!-- Footer -->
             <div
-                class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end">
+                class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-between gap-4">
+                <button id="prev-btn"
+                    class="px-6 py-2.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed">Previous</button>
                 <button id="next-btn"
                     class="px-6 py-2.5 bg-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
             </div>
@@ -3178,6 +3180,7 @@
             const questionText = document.getElementById('question-text');
             const optionsContainer = document.getElementById('options-container');
             const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
             const scoreText = document.getElementById('score-text');
 
             const btnModerate = document.getElementById('quiz-btn-moderate');
@@ -3207,7 +3210,6 @@
                 if (typeof Proctor !== "undefined") Proctor.start();
             }
             window.openQuiz = openQuiz; // expose globally for inline onclick handlers
-
 
             if (btnAI) btnAI.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -3292,12 +3294,31 @@
                 quizProgress.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
                 questionText.textContent = q.question;
                 optionsContainer.innerHTML = '';
-                nextBtn.disabled = true;
+                
+                // Toggle Prev button visibility/state
+                prevBtn.disabled = currentQuestionIndex === 0;
+                
+                // Determine if we already have an answer for this question
+                const savedAnswer = userAnswers[currentQuestionIndex];
+                nextBtn.disabled = savedAnswer === undefined;
+
                 q.options.forEach((opt, idx) => {
                     const btn = document.createElement('button');
                     btn.className = 'w-full text-left p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-primary/50 hover:bg-primary/5 transition-all text-slate-700 dark:text-slate-300 font-medium option-btn relative';
+                    
+                    // If this was previously selected, style it accordingly
+                    if (savedAnswer === idx) {
+                        btn.classList.add('border-primary', 'bg-primary/10', 'text-primary');
+                    }
+
                     const span = document.createElement('span');
                     span.className = 'inline-block w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-600 mr-3 align-middle text-center leading-5 text-transparent transition-colors';
+                    
+                    if (savedAnswer === idx) {
+                        span.classList.remove('text-transparent', 'border-slate-300');
+                        span.classList.add('border-primary', 'bg-primary', 'text-white');
+                    }
+                    
                     span.textContent = '✓';
                     btn.appendChild(span);
                     btn.appendChild(document.createTextNode(opt));
@@ -3318,8 +3339,14 @@
                 nextBtn.textContent = currentQuestionIndex === currentQuestions.length - 1 ? 'Submit' : 'Next';
             }
 
+            prevBtn.addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    loadQuestion();
+                }
+            });
+
             nextBtn.addEventListener('click', () => {
-                if (userAnswers[currentQuestionIndex] === currentQuestions[currentQuestionIndex].correctAnswer) score++;
                 if (currentQuestionIndex < currentQuestions.length - 1) {
                     currentQuestionIndex++;
                     loadQuestion();
@@ -3334,6 +3361,12 @@
 
                 // Stop proctoring when results are shown
                 if (typeof Proctor !== "undefined") Proctor.stop();
+
+                // Calculate final score
+                score = 0;
+                currentQuestions.forEach((q, idx) => {
+                    if (userAnswers[idx] === q.correctAnswer) score++;
+                });
 
                 scoreText.textContent = score;
                 const totalQText = document.querySelector('#results-modal .text-xl.text-slate-400');
