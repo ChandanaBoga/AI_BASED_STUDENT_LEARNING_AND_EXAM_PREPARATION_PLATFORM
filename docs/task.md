@@ -1,0 +1,12 @@
+- [x] Generate Semester 1 (4 Subjects)
+- [x] Generate Semester 2 (4 Subjects)
+- [x] Generate Semester 3 (6 Subjects)
+- [x] Generate Semester 4 (5 Subjects)
+- [x] Generate Semester 5 (5 Subjects)
+- [x] Generate Semester 6 (5 Subjects)
+- [x] Generate Semester 7 (5 Subjects)
+- [x] Generate Semester 8 (4 Subjects)
+- [x] Final Integration
+    - [x] Update `combined_app.html` to aggregate semester files internally
+    - [x] Delete legacy `quiz_data.js`
+    - [x] Verify search and quiz functionality
