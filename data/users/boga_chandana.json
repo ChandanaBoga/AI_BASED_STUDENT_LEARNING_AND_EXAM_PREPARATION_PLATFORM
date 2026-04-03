@@ -1,0 +1,54 @@
+{
+  "fullname": "BOGA CHANDANA",
+  "age": "20",
+  "dob": "2004-07-15",
+  "year": "4",
+  "semester": "2",
+  "roll": "22K91A6623",
+  "performance": {
+    "moderate": {
+      "attempts": 0,
+      "bestScore": 0,
+      "unlocked": true
+    },
+    "high": {
+      "attempts": 0,
+      "bestScore": 0,
+      "unlocked": true
+    },
+    "advance": {
+      "attempts": 0,
+      "bestScore": 0,
+      "unlocked": true
+    },
+    "sem1-c-programming": {
+      "attempts": 3,
+      "bestScore": 10,
+      "unlocked": true,
+      "totalQuestions": 10
+    },
+    "sem5-ml": {
+      "attempts": 1,
+      "bestScore": 7,
+      "totalQuestions": 10,
+      "unlocked": true
+    },
+    "sem7-nlp": {
+      "attempts": 1,
+      "bestScore": 9,
+      "totalQuestions": 10,
+      "unlocked": true
+    },
+    "sem3-python": {
+      "attempts": 3,
+      "bestScore": 10,
+      "totalQuestions": 10,
+      "unlocked": true
+    }
+  },
+  "notes": null,
+  "theme": "light",
+  "photo_url": "/data/uploads/boga_chandana/1000143106.jpg",
+  "resume_url": "/data/uploads/boga_chandana/Chandana_Resume.pdf",
+  "password": "9121175053_cC"
+}

@@ -1,0 +1,21 @@
+{
+  "fullname": "Test User",
+  "age": "",
+  "dob": "",
+  "year": "",
+  "semester": "",
+  "roll": "",
+  "performance": null,
+  "notes": [
+    {
+      "id": 123,
+      "title": "Test Note",
+      "content": "Hello World",
+      "lastModified": "2026-03-30T10:00:00Z"
+    }
+  ],
+  "theme": null,
+  "photo_url": null,
+  "resume_url": null,
+  "password": null
+}

@@ -1,0 +1,37 @@
+{
+  "fullname": "Aishwarya Pasham",
+  "age": "21",
+  "dob": "2005-03-15",
+  "year": "4",
+  "semester": "2",
+  "roll": "22K91A66C7",
+  "performance": {
+    "moderate": {
+      "attempts": 0,
+      "bestScore": 0,
+      "unlocked": true
+    },
+    "high": {
+      "attempts": 0,
+      "bestScore": 0,
+      "unlocked": true
+    },
+    "advance": {
+      "attempts": 0,
+      "bestScore": 0,
+      "unlocked": true
+    },
+    "sem1-c-programming": {
+      "attempts": 1,
+      "bestScore": 7,
+      "totalQuestions": 10,
+      "unlocked": true
+    },
+    "sem1-english": {
+      "attempts": 1,
+      "bestScore": 7,
+      "totalQuestions": 10,
+      "unlocked": true
+    }
+  }
+}
