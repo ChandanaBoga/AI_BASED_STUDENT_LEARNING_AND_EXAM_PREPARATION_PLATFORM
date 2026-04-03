@@ -16,7 +16,7 @@ import sys
 import time
 
 # Configuration
-os.environ["OLLAMA_HOST"] = "127.0.0.1:11434"
+os.environ["OLLAMA_HOST"] = "http://127.0.0.1:11434"
 
 AI_VENV_PYTHON = os.path.join("backend", "venv", "Scripts", "python.exe")
 AI_SCRIPT      = "ai_service.py"

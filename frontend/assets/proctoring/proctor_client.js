@@ -267,6 +267,11 @@
             console.debug("[Proctor] AI Raw Response:", data.description);
             console.log(`[Proctor] Analysis -> Distracted: ${data.is_distracted} | Multi-Person: ${data.is_multi_person}`);
 
+            if (!isRunning) {
+                console.info("[Proctor] Ignoring response since proctoring is stopped.");
+                return;
+            }
+
             if (data.is_distracted || data.is_multi_person) {
                 warningCount++;
                 const violationType = data.is_multi_person ? "multi_person" : "distraction";
@@ -368,6 +373,8 @@
             // Remove event listeners
             window.removeEventListener("blur", onBlur);
             document.removeEventListener("visibilitychange", onVisibilityChange);
+            
+            dismissWarning();
         },
 
         reset() {

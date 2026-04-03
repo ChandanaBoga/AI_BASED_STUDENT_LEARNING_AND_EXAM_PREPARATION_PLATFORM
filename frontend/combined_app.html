@@ -6,7 +6,28 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Btech Box - All-in-One SPA</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script src="assets/quiz_data.js"></script>
+    <script src="assets/quiz_sem1.js"></script>
+    <script src="assets/quiz_sem2.js"></script>
+    <script src="assets/quiz_sem3.js"></script>
+    <script src="assets/quiz_sem4.js"></script>
+    <script src="assets/quiz_sem5.js"></script>
+    <script src="assets/quiz_sem6.js"></script>
+    <script src="assets/quiz_sem7.js"></script>
+    <script src="assets/quiz_sem8.js"></script>
+    <script>
+        // Aggregate semester-wise quiz data into a single global quizData object
+        const quizData = {
+            ...(typeof quizDataSem1 !== 'undefined' ? quizDataSem1 : {}),
+            ...(typeof quizDataSem2 !== 'undefined' ? quizDataSem2 : {}),
+            ...(typeof quizDataSem3 !== 'undefined' ? quizDataSem3 : {}),
+            ...(typeof quizDataSem4 !== 'undefined' ? quizDataSem4 : {}),
+            ...(typeof quizDataSem5 !== 'undefined' ? quizDataSem5 : {}),
+            ...(typeof quizDataSem6 !== 'undefined' ? quizDataSem6 : {}),
+            ...(typeof quizDataSem7 !== 'undefined' ? quizDataSem7 : {}),
+            ...(typeof quizDataSem8 !== 'undefined' ? quizDataSem8 : {}),
+        };
+        console.log("Quiz Data aggregated successfully. Total subjects:", Object.keys(quizData).length);
+    </script>
     <!-- Monaco Editor CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;display=swap"
@@ -609,7 +630,7 @@
                                     Live System Status
                                 </div>
                                 <h1 class="text-white text-5xl lg:text-6xl font-black leading-none tracking-tight">
-                                    Academic Dashboard</h1>
+                                    Academic Dashboard <span class="text-accent text-lg font-bold">v1.2 Live</span></h1>
                                 <p class="text-blue-100/80 text-lg max-w-xl font-medium">Welcome back! here's your
                                     personalized academic overview and recent updates.</p>
                             </div>
@@ -2191,15 +2212,24 @@
         let notes = [];
         let activeNoteId = null;
 
+        function getNotesKey(userOverride = null) {
+            const user = userOverride || localStorage.getItem('btech-logged-in-user');
+            return user ? 'btech_box_notes_v2_' + user.replace(/\s+/g, '_').toLowerCase() : 'btech_box_notes_v2';
+        }
+        function getActiveIdKey(userOverride = null) {
+            const user = userOverride || localStorage.getItem('btech-logged-in-user');
+            return user ? 'btech_box_active_note_id_' + user.replace(/\s+/g, '_').toLowerCase() : 'btech_box_active_note_id';
+        }
+
         function setupNotes() {
             const notesArea = document.getElementById('personal-notes-area');
             const noteTitle = document.getElementById('active-note-title');
 
             // Load from localStorage
-            const saved = localStorage.getItem('btech_box_notes_v2');
+            const saved = localStorage.getItem(getNotesKey());
             if (saved) {
                 notes = JSON.parse(saved);
-                activeNoteId = localStorage.getItem('btech_box_active_note_id');
+                activeNoteId = localStorage.getItem(getActiveIdKey());
             }
 
             // Only create a default note if we are a guest and have nothing
@@ -2220,6 +2250,27 @@
                 }
             }
 
+            // 100% Guaranteed sync from Backend to cover any local cache faults
+            if (loggedInUser) {
+                fetch(`${AI_BASE_URL}/load_notes/${encodeURIComponent(loggedInUser)}`)
+                    .then(r => r.json())
+                    .then(backendNotes => {
+                        if (backendNotes && backendNotes.length > 0) {
+                            notes = backendNotes;
+                            localStorage.setItem(getNotesKey(), JSON.stringify(notes));
+                            renderNotesList();
+                            
+                            // Prevent cursor disruption
+                            if (activeNoteId && notes.some(n => n.id == activeNoteId)) {
+                                displayNote(notes.find(n => n.id == activeNoteId));
+                            } else {
+                                switchNote(notes[0].id);
+                            }
+                        }
+                    })
+                    .catch(e => console.error("[Sync] Could not pull notes from server on setup: ", e));
+            }
+
             // Auto-save listeners
             let saveTimeout;
             const autoSave = () => {
@@ -2234,6 +2285,25 @@
 
             notesArea?.addEventListener('input', autoSave);
             noteTitle?.addEventListener('input', autoSave);
+
+            // Force save on blur (when user clicks away)
+            notesArea?.addEventListener('blur', () => saveActiveNote(false));
+            noteTitle?.addEventListener('blur', () => saveActiveNote(false));
+
+            // Final save before tab close/refresh
+            window.addEventListener('beforeunload', () => {
+                const loggedInUser = localStorage.getItem('btech-logged-in-user');
+                if (loggedInUser && notes.length > 0) {
+                    saveActiveNote(true);
+                    
+                    // Force a guaranteed network request to backend so data isn't lost on dying tab
+                    const blob = new Blob([JSON.stringify({
+                        fullname: loggedInUser,
+                        notes: notes
+                    })], { type: 'application/json' });
+                    navigator.sendBeacon(`${AI_BASE_URL}/save_notes`, blob);
+                }
+            });
         }
 
         function createNewNote(title = "Untitled Note", content = "") {
@@ -2279,7 +2349,7 @@
             if (activeNoteId) saveActiveNote(true);
 
             activeNoteId = id;
-            localStorage.setItem('btech_box_active_note_id', id);
+            localStorage.setItem(getActiveIdKey(), id);
 
             const note = notes.find(n => n.id == id);
             if (note) {
@@ -2342,7 +2412,7 @@
         }
 
         async function saveToStorage() {
-            localStorage.setItem('btech_box_notes_v2', JSON.stringify(notes));
+            localStorage.setItem(getNotesKey(), JSON.stringify(notes));
             await syncUserProfileWithBackend();
         }
 
@@ -2351,33 +2421,38 @@
             if (!loggedInUser) return;
 
             try {
+                // 1. Sync Profile/Performance
                 // Fetch current profile to preserve other fields
-                const response = await fetch(`${AI_BASE_URL}/load_user/${encodeURIComponent(loggedInUser)}`);
+                const profileResponse = await fetch(`${AI_BASE_URL}/load_user/${encodeURIComponent(loggedInUser)}`);
                 let profile = {};
-                if (response.ok) {
-                    profile = await response.json();
+                if (profileResponse.ok) {
+                    profile = await profileResponse.json();
                 }
 
-                // Update with latest local data
                 profile.fullname = loggedInUser;
-                profile.notes = notes;
-                
-                // Also sync performance and theme
                 const perfKey = `tkr_quiz_performance_${loggedInUser.replace(/\s+/g, '_').toLowerCase()}`;
                 const localPerf = localStorage.getItem(perfKey);
                 if (localPerf) profile.performance = JSON.parse(localPerf);
                 profile.theme = localStorage.getItem('btech-theme') || 'light';
 
-                const saveResponse = await fetch(`${AI_BASE_URL}/save_user`, {
+                await fetch(`${AI_BASE_URL}/save_user`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(profile)
                 });
+
+                // 2. Sync Notes (to dedicated store)
+                const notesResponse = await fetch(`${AI_BASE_URL}/save_notes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fullname: loggedInUser,
+                        notes: notes
+                    })
+                });
                 
-                if (saveResponse.ok) {
-                    console.log("[Sync] User notes and profile successfully saved to backend.");
-                } else {
-                    console.error("[Sync] Backend save failed:", await saveResponse.text());
+                if (notesResponse.ok) {
+                    console.log("[Sync] Notes successfully saved to dedicated store.");
                 }
             } catch (e) {
                 console.error("[Sync] Error during background synchronization:", e);
@@ -2386,28 +2461,51 @@
 
         async function loadUserProfileFromBackend(profile) {
             if (!profile) return;
-            console.log(`[Sync] Loading full profile for: ${profile.fullname}`);
+            console.log(`[Sync] Loading full profile and notes for: ${profile.fullname}`);
 
-            // 1. Sync Notes
-            if (profile.notes) {
-                notes = profile.notes;
-                // If the user has no notes yet, give them a personalized welcome note
-                if (notes.length === 0) {
-                    notes.push({
-                        id: Date.now(),
-                        title: `Welcome, ${profile.fullname}!`,
-                        content: "Start your academic journey by taking notes here.",
-                        lastModified: new Date().toISOString()
-                    });
+            // 1. Fetch Notes from dedicated store
+            try {
+                const notesResp = await fetch(`${AI_BASE_URL}/load_notes/${encodeURIComponent(profile.fullname)}`);
+                if (notesResp.ok) {
+                    const backendNotes = await notesResp.json();
+                    if (backendNotes && backendNotes.length > 0) {
+                        notes = backendNotes;
+                        console.log(`[Sync] Loaded ${notes.length} notes from dedicated store.`);
+                    } else if (profile.notes && profile.notes.length > 0) {
+                        // Fallback to profile notes if dedicated store is empty (legacy migration support)
+                        notes = profile.notes;
+                        console.log("[Sync] Loaded notes from legacy profile backup.");
+                    }
                 }
+            } catch (e) {
+                console.error("[Sync] Error loading notes:", e);
+                // Fallback to legacy profile data if fetch fails
+                if (profile.notes) notes = profile.notes;
+            }
+
+            // If the user still has no notes, give them a welcome note
+            if (notes.length === 0) {
+                notes.push({
+                    id: Date.now(),
+                    title: `Welcome, ${profile.fullname}!`,
+                    content: "Start your academic journey by taking notes here.",
+                    lastModified: new Date().toISOString()
+                });
             }
             
-            localStorage.setItem('btech_box_notes_v2', JSON.stringify(notes));
+            localStorage.setItem(getNotesKey(profile.fullname), JSON.stringify(notes));
             
             // Re-initialize the active note from the loaded set
             if (notes.length > 0) {
-                activeNoteId = notes[0].id;
-                localStorage.setItem('btech_box_active_note_id', activeNoteId);
+                const activeIdKey = profile.fullname ? 'btech_box_active_note_id_' + profile.fullname.replace(/\s+/g, '_').toLowerCase() : 'btech_box_active_note_id';
+                const existingActiveId = localStorage.getItem(activeIdKey);
+                
+                if (existingActiveId && notes.some(n => n.id == existingActiveId)) {
+                    activeNoteId = existingActiveId;
+                } else {
+                    activeNoteId = notes[0].id;
+                    localStorage.setItem(activeIdKey, activeNoteId);
+                }
             }
 
             if (typeof renderNotesList === "function") renderNotesList();
@@ -2443,8 +2541,8 @@
         function clearNotes() {
             if (confirm('Are you sure you want to clear ALL your notes? This cannot be undone.')) {
                 notes = [];
-                localStorage.removeItem('btech_box_notes_v2');
-                localStorage.removeItem('btech_box_active_note_id');
+                localStorage.removeItem(getNotesKey());
+                localStorage.removeItem(getActiveIdKey());
                 setupNotes();
             }
         }
@@ -2897,7 +2995,7 @@
                 <div>
                     <h3 id="quiz-title" class="text-lg font-bold text-slate-800 dark:text-white">Module Title</h3>
                     <p id="quiz-progress" class="text-xs font-semibold text-primary uppercase tracking-wider mt-1">
-                        Question 1 of 20</p>
+                        Question 1 of 10</p>
                 </div>
                 <button id="close-quiz-btn"
                     class="p-2 text-slate-400 hover:text-red-500 transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
@@ -2939,7 +3037,7 @@
                 <p class="text-sm text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">Your
                     Score</p>
                 <div class="text-4xl font-black text-primary"><span id="score-text">0</span><span
-                        class="text-xl text-slate-400">/20</span></div>
+                        class="text-xl text-slate-400">/10</span></div>
             </div>
 
             <div class="flex gap-4 w-full">
@@ -2970,6 +3068,7 @@
     </div>
 
     <script>
+        console.log("%c [Btech Box] System v1.2 Initializing... ", "background: #0066cc; color: #fff; font-weight: bold; padding: 4px; border-radius: 4px;");
         // Define AI_BASE_URL globally for all scripts to use
         // If protocol is 'file:', we MUST target localhost:8001
         // If protocol is 'http:', we can use empty string for relative paths (safer for proxying)
@@ -3087,7 +3186,7 @@
                     const totalAttempts = activeModules.reduce((a, [, d]) => a + d.attempts, 0);
                     let sumPerc = 0;
                     activeModules.forEach(([k, d]) => {
-                        let t = (typeof quizData !== 'undefined' && quizData[k]) ? quizData[k].length : (d.totalQuestions || 10);
+                        let t = 10; // Quizzes are 10 questions long per session
                         sumPerc += Math.min(100, Math.round((d.bestScore / t) * 100));
                     });
                     const avgPerc = Math.round(sumPerc / activeModules.length);
@@ -3102,7 +3201,7 @@
                     // Render velocity cards
                     grid.innerHTML = activeModules.map(([key, data]) => {
                         const conf = configs[key] || getSubjectConfig(key);
-                        const total = (typeof quizData !== 'undefined' && quizData[key]) ? quizData[key].length : (data.totalQuestions || 10);
+                        const total = 10; // Quizzes are 10 questions long
                         const perc = Math.min(100, Math.round((data.bestScore / total) * 100));
                         const grade = perc >= 90 ? '🏆 Excellent' : perc >= 70 ? '✅ Good' : perc >= 50 ? '📘 Average' : '📉 Needs Work';
                         return `
@@ -3141,7 +3240,7 @@
                     // Animate card bars with slight delay
                     setTimeout(() => {
                         activeModules.forEach(([key, data]) => {
-                            const total = (typeof quizData !== 'undefined' && quizData[key]) ? quizData[key].length : (data.totalQuestions || 10);
+                            const total = 10; // Quizzes are 10 questions long
                             const perc = Math.min(100, Math.round((data.bestScore / total) * 100));
                             const bar = document.getElementById('vcbar-' + key);
                             if (bar) bar.style.width = perc + '%';
@@ -3191,13 +3290,25 @@
             const aiTopicInput = document.getElementById('ai-topic-input');
             const startAIBtn = document.getElementById('start-ai-btn');
 
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
             function openQuiz(moduleKey, title) {
                 currentModule = moduleKey;
-                currentQuestions = quizData[moduleKey] || [];
+                const pool = quizData[moduleKey] || [];
+                if (pool.length === 0) return;
+                
+                // Shuffle and pick 10
+                currentQuestions = shuffleArray([...pool]).slice(0, 10);
+                
                 currentQuestionIndex = 0;
                 score = 0;
                 userAnswers = [];
-                if (currentQuestions.length === 0) return;
                 quizTitle.textContent = title;
                 modalContainer.classList.remove('hidden');
                 modalContainer.classList.add('flex');
@@ -3691,11 +3802,6 @@
             localStorage.setItem('btech-theme', theme);
             updateThemeActiveState(theme);
             closeThemeDropdown();
-
-            // Sync theme to backend if possible
-            if (typeof syncUserProfileWithBackend === "function") {
-                syncUserProfileWithBackend();
-            }
         }
 
         function updateThemeActiveState(theme) {
@@ -4401,7 +4507,7 @@
 </body>
 
 <!-- ── Proctoring Client ───────────────────────────────────────────── -->
-<script src="assets/proctoring/proctor_client.js"></script>
+<script src="assets/proctoring/proctor_client.js?v=2"></script>
 
 
 </html>

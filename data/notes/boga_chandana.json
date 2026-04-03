@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1775026041490,
+    "title": "DL",
+    "content": "Deep learning is a subset of machine learning based on artificial neural networks with multiple layers (hence \"deep\") that mimic the human brain to learn patterns from vast amounts of data. It powers advanced AI, such as image recognition and generative AI, by automatically adjusting network weights to improve accuracy.",
+    "lastModified": "2026-04-03T13:53:52.981Z"
+  },
+  {
+    "id": 1774941529928,
+    "title": "AI",
+    "content": "Artificial Intelligence (AI) is a branch of computer science that enables machines to simulate human intelligence, including learning, reasoning, problem-solving, and perception. These systems analyze vast datasets to identify patterns and make autonomous decisions, transforming fields like healthcare, finance, and transportation. Key forms include machine learning, deep learning, and generative AI, with current trends focusing on agentic systems, such as CustomerInsights.AI for data-driven decisions.",
+    "lastModified": "2026-04-03T11:10:46.389Z"
+  }
+]

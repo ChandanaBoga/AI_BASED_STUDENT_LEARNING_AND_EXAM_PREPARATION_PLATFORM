@@ -12,7 +12,7 @@ import subprocess
 import tempfile
 import shutil
 import sys
-import ollama
+from ollama import Client
 import uvicorn
 import logging
 import httpx
@@ -35,16 +35,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Ollama Client setup
+# We use an explicit client to avoid issues with global module state in async environments.
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")
+logger.info(f"Initializing Ollama client with host: {OLLAMA_HOST}")
+ai_client = Client(host=OLLAMA_HOST)
+
 # --- Static File Serving ---
 FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
 
 @app.get("/")
 async def read_index():
-    return FileResponse(os.path.join(FRONTEND_DIR, "combined_app.html"))
+    response = FileResponse(os.path.join(FRONTEND_DIR, "combined_app.html"))
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 @app.get("/combined_app.html")
 async def read_combined_app():
-    return FileResponse(os.path.join(FRONTEND_DIR, "combined_app.html"))
+    response = FileResponse(os.path.join(FRONTEND_DIR, "combined_app.html"))
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIR, "assets")), name="assets")
 
@@ -114,6 +128,10 @@ class CodeSaveRequest(BaseModel):
     filename: str
     code: str
     language: str
+
+class NotesRequest(BaseModel):
+    fullname: str
+    notes: List[Dict[str, Any]]
 
 
 # --- Knowledge Base ---
@@ -198,14 +216,14 @@ async def chat_endpoint(request: ChatRequest):
 
         response = await asyncio.wait_for(
             asyncio.to_thread(
-                ollama.chat,
+                ai_client.chat,
                 model='llama3.2:3b',
                 messages=[
                     {'role': 'system', 'content': system_content},
                     {'role': 'user',   'content': request.message},
                 ]
             ),
-            timeout=120.0   # reduced: if it hasn't finished in 2 min, something is wrong
+            timeout=120.0
         )
         logger.info("[/chat] Ollama responded.")
         return {"response": response.message.content}
@@ -224,7 +242,7 @@ async def _stream_ollama(message: str) -> AsyncIterator[str]:
     system_content = build_system_prompt(kb_snippet)
 
     def _sync_stream():
-        return ollama.chat(
+        return ai_client.chat(
             model='llama3.2:3b',
             messages=[
                 {'role': 'system', 'content': system_content},
@@ -318,19 +336,37 @@ async def generate_quiz(request: QuizRequest):
             "Return NOTHING but the JSON array."
         )
 
-        logger.info("[/generate_quiz] Calling Ollama…")
-        response = await asyncio.wait_for(
-            asyncio.to_thread(
-                ollama.chat,
-                model='llama3.2:3b',
-                messages=[
-                    {'role': 'system', 'content': system_prompt},
-                    {'role': 'user',   'content': prompt},
-                ]
-            ),
-            timeout=180.0
-        )
-        logger.info("[/generate_quiz] Ollama responded.")
+        # Retry Logic for Ollama Call
+        response = None
+        max_retries = 3
+        retry_delay = 1.5
+
+        for attempt in range(max_retries):
+            try:
+                logger.info(f"[/generate_quiz] Calling Ollama (Attempt {attempt+1}/{max_retries})…")
+                response = await asyncio.wait_for(
+                    asyncio.to_thread(
+                        ai_client.chat,
+                        model='llama3.2:3b',
+                        messages=[
+                            {'role': 'system', 'content': system_prompt},
+                            {'role': 'user',   'content': prompt},
+                        ]
+                    ),
+                    timeout=180.0
+                )
+                logger.info("[/generate_quiz] Ollama responded SUCCESSFULLY.")
+                break
+            except Exception as e:
+                if "Failed to connect" in str(e) or "Connection error" in str(e):
+                    logger.warning(f"[/generate_quiz] Connection failure on attempt {attempt+1}: {e}")
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(retry_delay)
+                        continue
+                raise e
+
+        if not response:
+            raise HTTPException(status_code=500, detail="Failed to get response from AI service after retries.")
 
         raw_content = response.message.content
         clean_content = _extract_json_from_llm_response(raw_content)
@@ -449,6 +485,54 @@ async def update_password(request: Request):
         return {"status": "success", "message": "Password updated."}
     except Exception as e:
         logger.error(f"[/update_password] Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- Dedicated Notes Storage ---
+NOTES_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "notes")
+if not os.path.exists(NOTES_DIR):
+    os.makedirs(NOTES_DIR)
+
+@app.post("/save_notes")
+async def save_notes(request: NotesRequest):
+    try:
+        filename = f"{request.fullname.replace(' ', '_').lower()}.json"
+        path = os.path.join(NOTES_DIR, filename)
+        
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(request.notes, f, indent=2)
+            
+        logger.info(f"[Notes] Saved {len(request.notes)} notes for {request.fullname}")
+        return {"status": "success", "message": "Notes saved to dedicated store."}
+    except Exception as e:
+        logger.error(f"[/save_notes] Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/load_notes/{fullname}")
+async def load_notes(fullname: str):
+    try:
+        filename = f"{fullname.replace(' ', '_').lower()}.json"
+        path = os.path.join(NOTES_DIR, filename)
+        
+        if os.path.exists(path):
+            with open(path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        
+        # MIGRATION: Check if notes exist in the main user profile
+        user_path = os.path.join(USERS_DIR, filename)
+        if os.path.exists(user_path):
+            with open(user_path, 'r', encoding='utf-8') as f:
+                user_data = json.load(f)
+                if 'notes' in user_data and user_data['notes']:
+                    logger.info(f"[Migration] Found legacy notes for {fullname} in user profile.")
+                    # Automatically migrate them
+                    with open(path, 'w', encoding='utf-8') as f_out:
+                        json.dump(user_data['notes'], f_out, indent=2)
+                    return user_data['notes']
+                    
+        return [] # Default empty list if no notes found anywhere
+    except Exception as e:
+        logger.error(f"[/load_notes] Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
